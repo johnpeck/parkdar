@@ -1,0 +1,12 @@
+[submodule "jpeda"]
+	path = jpeda
+	url = git@github.com:johnpeck/jpeda.git
+[submodule "implement/drawings/doctools"]
+	path = implement/drawings/doctools
+	url = git@github.com:johnpeck/doctools.git
+[submodule "notes/doctools"]
+	path = notes/doctools
+	url = git@github.com:johnpeck/doctools.git
+[submodule "implement/howto/doctools"]
+	path = implement/howto/doctools
+	url = git@github.com:johnpeck/doctools.git

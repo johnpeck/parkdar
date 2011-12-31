@@ -1,0 +1,5 @@
+Parking radar using the AVR Butterfly.
+
+To pull in submodules after cloning:
+git submodule init
+git submodule update

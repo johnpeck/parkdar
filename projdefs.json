@@ -1,0 +1,6 @@
+{
+"project_name"      : "pencils",
+"schematic_pages"   : ["contents.sch","stimulus.sch","stim_driver.sch",
+                       "shunt_driver.sch","power.sch","hardware.sch"
+                      ]
+}

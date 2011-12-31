@@ -1,0 +1,46 @@
+Function descriptions from the pencils code.
+* fosc_cal
+** Calibrate the system clock to be 1MHz using the watch crystal on the butterfly board.
+** Uses timer1 and timer2, but releases them when done.
+* portb_init
+** Set port B to be an output.
+* usart_init
+** Set 9600 baud
+** Set 8 bits, no parity, 1 stop bit
+* timer2_stop
+** Stops timer2
+* usart_puts
+** Sends a string over the USART
+* adc_init
+** Chooses Vcc as the analog reference.
+** DONE How do the two lines setting ADMUX work to choose the reference and set the input?
+   - It seems like I set an ADMUX value, then clobber it with |= 1.
+** DONE Make sure this function just sets the reference, not the input.
+** DONE Make a separate function to set the AD mux position.
+   - setmux(uint_8)
+** Set the SAR clock to 125kHz.
+* lcd_init
+** Clear the segment buffer
+** Set the contrast level
+** Select clock source
+** DONE Which clock does the LCD use?  I didn't know it used one.
+** Set frame rate
+** DONE This function really needs to be better commented
+* lcd_puts
+** DONE Figure out if the s[] argument passed to usart_puts and *pStr are the same thing.  They might both be pointers to the beginning of string data.
+** Sends a string to the LCD
+* memset
+** Initializes the array data
+* usart_receive()
+** Waits for data to be ready from the USART, then grabs it.
+* sendchar
+** DONE Change the name of this function to usart_putc
+** Writes a character to the usart, which then transmits it.
+* DONE Write a function led_on() which just turns the LED on
+* timer2_start
+** This configures timer2 to be clocked by the watch crystal.  As such, it's the real-time clock.
+** This both sets up and starts timer2.  Kind of wish those two steps were separated.
+* DONE Separate the timer2 init and the timer2 start functions.
+** I should make a timer2_rtc() function that sets up timer2 to be clocked by the watch crystal, then leaves it stopped.
+** I'll have to re-write fosc_cal when I do this.
+* 
