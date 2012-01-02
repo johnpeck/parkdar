@@ -10,3 +10,6 @@
 [submodule "implement/howto/doctools"]
 	path = implement/howto/doctools
 	url = git@github.com:johnpeck/doctools.git
+[submodule "implement/data/protoscript"]
+	path = implement/data/protoscript
+	url = git@github.com:johnpeck/protoscript.git

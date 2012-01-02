@@ -17,6 +17,8 @@
 #define OFF 0
 
 int main(void) {
+    uint8_t adc_data = 0;
+    
     sei(); // Enable interrupts
     fosc_cal(); // Set calibrated 1MHz system clock
     portb_init(); // Set up port B
@@ -30,8 +32,10 @@ int main(void) {
     usart_puts("Start main loop\r\n");
     lcd_puts("Hello",0); // From LCD_functions
     timer2_start(); // Start stimulus
+    adc_mux(1); // Switch to the voltage reader at J407
     for(;;) {
-
+        adc_data = adc_read();
+        adc_report(adc_data);
     }// end main for loop
 } // end main
 
@@ -210,7 +214,7 @@ void adc_init(void) {
 
 /* Set the mux channel for the ADC input.
  * channel = 0 -- ADC0
- * channel = 1 -- ADC1
+ * channel = 1 -- ADC1 (Voltage at J407 divided by ~5)
  * ...
  * channel = 7 -- ADC7
  *
@@ -247,7 +251,7 @@ void adc_report(uint8_t repdata) {
     //usart_puts("The ADC value is 0x");
     sprintf(s,"%x ",repdata);
     usart_puts(s); // Send to the USART
-    //usart_puts("\r\n");
+    usart_puts("\r\n");
     //sprintf(s,"0x%x",repdata);
     //lcd_puts(s,0); // Send to the LCD
 }
