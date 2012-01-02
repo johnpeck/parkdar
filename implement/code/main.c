@@ -17,7 +17,8 @@
 #define OFF 0
 
 int main(void) {
-    uint8_t adc_data = 0;
+    uint16_t adc_data = 0;
+
     
     sei(); // Enable interrupts
     fosc_cal(); // Set calibrated 1MHz system clock
@@ -34,7 +35,7 @@ int main(void) {
     timer2_start(); // Start stimulus
     adc_mux(1); // Switch to the voltage reader at J407
     for(;;) {
-        adc_data = adc_read();
+        adc_read(&adc_data);
         adc_report(adc_data);
     }// end main for loop
 } // end main
@@ -225,10 +226,10 @@ void adc_mux(uint8_t channel) {
     ADMUX |= channel;
 }
 
-/* adc_read() */
-inline uint8_t adc_read(void) {
+/* adc_read() 
+ * Reads raw data from the ADC selected by adc_mux(). */
+void adc_read(uint16_t *adc_data) {
     uint16_t adc_temp = 0;
-    uint8_t adc_int = 0;
 
     /* Enable the ADC.  It seems like I already did this in adc_init(),
      * but the part locks up if I don't also do it here. */
@@ -238,14 +239,12 @@ inline uint8_t adc_read(void) {
     while(!(ADCSRA & (1<<ADIF)));  // wait for conversion to finish
     adc_temp = ADCL;            // read out ADCL register
     adc_temp += (ADCH << 8);    // read out ADCH register
-    adc_int = (uint8_t)(adc_temp >> 2); // Throw away bottom 2 bits
-
-    return adc_int;
+    *adc_data = adc_temp;
 }
 
 /* adc_report()
  * Writes the ADC value to the USART and the LCD */
-void adc_report(uint8_t repdata) {
+void adc_report(uint16_t repdata) {
     char s[10];
 
     //usart_puts("The ADC value is 0x");
