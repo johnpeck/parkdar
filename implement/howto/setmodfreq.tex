@@ -1,0 +1,5 @@
+Use timer2's output compare value \texttt{OCR2A} to adjust the modulation frequency.  With no prescaler for timer2's clock, the square wave appearing at pin \texttt{OC2A} will have the frequency
+\begin{equation}
+f_m = \frac{32.768\mathrm{kHz}}{2 \times \mathtt{OCR2A}}
+\end{equation}
+where the factor of 2 appears because \texttt{OC2A} has to toggle twice to complete one cycle.

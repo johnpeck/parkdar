@@ -1,0 +1,49 @@
+\input{doctools/latex/notes_template.tex}   % Page setup
+\input{doctools/latex/mycommands.tex}       % Some useful commands
+\input{doctools/latex/units.tex}            % Define some units
+\input{doctools/latex/regcommands.tex}      % For defining registers
+
+\newcommand{\isdraft}{1} % Choose 1 for draft, 0 for release
+
+% Figure search path
+\graphicspath{
+              {figs/} % Figures drawn with xfig
+}
+
+\begin{document}
+
+% Title
+\thispagestyle{empty}   % First page does not need headers and footers
+\vspace*{\fill}
+\begin{center}
+    {\huge parkdar howto}\\
+    \today
+\end{center}
+\vspace*{\fill}
+\clearpage
+
+% Table of contents
+\pagestyle{toc}
+\tableofcontents
+\clearpage
+\pagestyle{normal}
+
+% Operation
+\part{Operation}
+    \section{Setting the modulation frequency}
+        \input{setmodfreq}
+
+
+
+
+
+% Appendix
+\appendix{} % Reset section numbering for the appendix
+\noappendicestocpagenum{}   % No page number for the appendix in the toc
+\appendixpage{} % Insert an appendix page
+\addappheadtotoc{}  % Add and entry for the appendix page in the toc
+
+% Bibliography
+%\bibliography{doctools/latex/ecrefs}
+
+\end{document}

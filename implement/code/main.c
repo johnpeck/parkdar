@@ -10,11 +10,7 @@
 #include "LCD_functions.h"
 
 /* Global variables */
-volatile uint8_t dataindex = 0;
-volatile uint8_t donesamp = 0;
-uint8_t vdata[256]; // ADC voltage data
-uint8_t idata[256]; // ADC current data
-uint8_t *dpointer; // Points to data array in use
+
 
 /* Definitions for led() */
 #define ON 1
@@ -35,32 +31,7 @@ int main(void) {
     lcd_puts("Hello",0); // From LCD_functions
     timer2_start(); // Start stimulus
     for(;;) {
-        memset(vdata,0x0,sizeof(vdata));
-        memset(idata,0x0,sizeof(idata));
-        usart_receive(); // Wait for trigger;
-        adc_mux(1); // Switch to ADC1 to measure voltage drive
-        dpointer = vdata;
-        donesamp = 0;
-        dataindex = 0;
-        timer0_start(); // Start timer0 for timed voltage sampling
-        while(donesamp == 0); // Wait for voltage sampling to end
-        cli(); // Disable interrupts until we set up current acquisition
-        adc_mux(4); // Switch to ADC4 to measure current response
-        dpointer = idata;
-        donesamp = 0;
-        dataindex = 0;
-        timer0_start();
-        sei();
-        while(donesamp == 0); // Wait for current sampling to end
-        uint8_t printdex = 0;
-        for(printdex = 0; printdex < (sizeof vdata -1); printdex++) {
-            adc_report(vdata[printdex]); // print voltage data
-        }
-        usart_puts("\r\n");
-        for(printdex = 0; printdex < (sizeof idata -1); printdex++) {
-            adc_report(idata[printdex]); // print current data
-        }
-        usart_puts("\r\n");
+
     }// end main for loop
 } // end main
 
@@ -76,7 +47,8 @@ int main(void) {
 }
 
 /* portb_init()
- * I have an LED at PB4
+ * I have an LED at PB4, and I'm using it as the output compare pin
+ *     for timer0.
  * I'm using PB7 as the output compare pin for timer2 */
 void portb_init(void) {
     DDRB |= (1<<DDB4); // Set bit 4 of port B for output
@@ -85,7 +57,11 @@ void portb_init(void) {
 
 /* timer2_init()
  * Timer 2 is an 8-bit timer that can be operated asynchronously.  I'll
- * use it clocked by the 32.768 kHz crystal on the butterfly. */
+ *     use it clocked by the 32.768 kHz crystal on the butterfly.
+ * In CTC mode, the OC2A pin will toggle when the timer reaches the
+ *     compare register value.  The pin has to toggle twice to reach
+ *     its original state, so the square wave frequency at OC2A will be
+ *     32.768kHz / (2 * OCR2A) with no prescaler. */
 void timer2_init(void) {
     /* The recommended procedure for switching to an asychronous clock
      * source:
@@ -93,14 +69,14 @@ void timer2_init(void) {
     TIMSK2 = 0;
     /* 2. Set timer 2 to be clocked from the TOSC1 pin */
     ASSR = (1<<AS2);
-    /* 3a. Set timer 2 prescaler */
+    /* 3a. Set timer 2 prescaler. No prescaler is 001. */
     TCCR2A = (0<<CS22) | (0<<CS21) | (1<<CS20);
     /* 3b. Set Clear on Timer match mode */
     TCCR2A |= (1<<WGM21) | (0<<WGM20);
     /* 3c. Set the OC2A pin to toggle on compare match */
     TCCR2A |= (0<<COM2A1) | (1<<COM2A0);
     /* 4. Set timer 2's output compare register */
-    OCR2A = 16;
+    OCR2A = 33;
     /* 5. Set the initial counter register value */
     TCNT2 = 0;
     /* 6. Look at the asynchronous status register to figure out if
@@ -112,16 +88,16 @@ void timer2_init(void) {
      while((ASSR & 1<<TCN2UB) | (ASSR & 1<<TCR2UB) | (ASSR & 1<<OCR2UB));
      /* 7. Clear timer 2 interrupt flags */
      TIFR2 = 0;
-     /* 8. Enable output compare match interrupt. */
-     //TIMSK2 = 1 << OCIE2A;
+     /* 8. Enable output compare match interrupt if necessary using:
+      * TIMSK2 = 1 << OCIE2A */
      timer2_stop(); // Stop the counter
      TCNT2 = 0; // Reset the counter
 }
 
 /* timer2_start()
- * Simply writes a prescaler value to start timer2 */
+ * Simply writes a prescaler value to start timer2.  */
 void timer2_start(void) {
-    /* Set timer 2 prescaler */
+    /* Set timer 2 prescaler.  No prescaler is 001. */
     TCCR2A |= (0<<CS22) | (0<<CS21) | (1<<CS20);
     /* Look at the asynchronous status register to figure out if timer 2
      * has settled in to normal operation.  This means that the counter
@@ -261,16 +237,6 @@ inline uint8_t adc_read(void) {
     adc_int = (uint8_t)(adc_temp >> 2); // Throw away bottom 2 bits
 
     return adc_int;
-}
-
-/* getdata()
- * Reads the ADC and puts the result into a data array */
-inline void getdata() {
-    dpointer[dataindex++] = adc_read();
-    if (dataindex == 0) { // If dataindex == 0, we've overflowed
-        donesamp = 1;
-        timer0_stop();
-    }
 }
 
 /* adc_report()
@@ -434,6 +400,6 @@ void fosc_cal(void) {
  * atmega169pa. */
 ISR(SIG_OUTPUT_COMPARE0) {
     led(ON);
-    getdata();
+    /* The interrupt code goes here. */
     led(OFF);
 }

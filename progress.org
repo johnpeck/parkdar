@@ -1,1 +1,3 @@
 * <2011-12-30 Fri> Created this project.
+* <2012-01-01 Sun> Created minicom configuration.
+  - As long as the FTDI dongle enumerates as /dev/ttyUSB0, simply starting minicom with "minicom parkdar" will bring up the terminal with all the right settings.  I had to configure minicom as root to set this configuration.

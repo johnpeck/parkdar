@@ -42,7 +42,6 @@
 # MCU name
 MCU = atmega169p
 
-
 # Processor frequency.
 #     This will define a symbol, F_CPU, in all source code files equal to the
 #     processor frequency. You can then use this symbol in your source code to
@@ -63,31 +62,24 @@ MCU = atmega169p
 #         F_CPU = 20000000
 F_CPU = 8000000
 
-
 # Output format. (can be srec, ihex, binary)
 FORMAT = ihex
 
-
 # Target file name (without extension).
 TARGET = main
-
 
 # Object files directory
 #     To put object files in current directory, use a dot (.), do NOT make
 #     this an empty or blank macro!
 OBJDIR = .
 
-
 # List C source files here. (C dependencies are automatically generated.)
 SRC = $(TARGET).c
 SRC += LCD_driver.c
 SRC += LCD_functions.c
 
-
-
 # List C++ source files here. (C dependencies are automatically generated.)
 CPPSRC =
-
 
 # List Assembler source files here.
 #     Make them always end in a capital .S.  Files ending in a lowercase .s
