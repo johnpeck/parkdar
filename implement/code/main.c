@@ -18,7 +18,6 @@
 
 int main(void) {
     uint16_t adc_data = 0;
-
     
     sei(); // Enable interrupts
     fosc_cal(); // Set calibrated 1MHz system clock
@@ -37,6 +36,7 @@ int main(void) {
     for(;;) {
         adc_read(&adc_data);
         adc_report(adc_data);
+        OCR0A = (uint8_t)(adc_data);
     }// end main for loop
 } // end main
 
@@ -116,27 +116,26 @@ void timer2_stop(void) {
     TCCR2A &= ~( (1<<CS22) | (1<<CS21) | (1<<CS20) );
 }
 
-/* timer0_init() */
+/* timer0_init() 
+ * This timer will supply the modulation tone pulses that will indicate
+ * the proximity of an obstacle.  It should be set up for phase-correct
+ * PWM mode.  This init function will both set up and start the timer. */
 void timer0_init(void) {
-    /* Set timer0 prescaler and set Clear on Timer Compare (CTC) match
-     * mode.
-     * A prescaler of 8 gives:
-     * fsamp,min = 1MHz / (8 * 256) = 488Hz
-     * fsamp,max = 1MHz / (8 * 2) = 62.5kHz */
-    TCCR0A = (0<<CS02) | (1<<CS01) | (0<<CS00) | (1<<WGM01) | (0<<WGM00);
-    /* Set timer0's output compare register */
-    OCR0A = 16;
+    /* Set timer0 prescaler and set phase-correct PWM mode (WGM 01).
+     * Prescalers:
+     * 100 -- fc/256 for ~130ms period
+     * 101 -- fc/1024 for ~512ms period */
+    TCCR0A = (1<<CS02) | (0<<CS01) | (1<<CS00) | (0<<WGM01) | (1<<WGM00);
+    /* Set compare output mode to clear the 0C0A pin after an up-counting 
+     * match, and set it after a down-counting match. */
+    TCCR0A |= (1<<COM0A1) | (0<<COM0A0);
+    /* Set timer0's initial output compare register */
+    OCR0A = 25;
     /* Clear timer0 interrupt flags */
-     TIFR0 = 0;
+    TIFR0 = 0;
     /* Enable output compare match interrupt. */
-     TIMSK0 = 1 << OCIE0A;
-     timer0_stop(); // Stop the counter
-     TCNT0 = 0; // Reset the counter
-}
-
-/* timer0_start() */
-void timer0_start(void) {
-    TCCR0A |= (0<<CS22) | (1<<CS21) | (0<<CS20);
+    TIMSK0 = 1 << OCIE0A;
+    TCNT0 = 0; // Reset the counter
 }
 
 /* timer0_stop() */
@@ -215,7 +214,7 @@ void adc_init(void) {
 
 /* Set the mux channel for the ADC input.
  * channel = 0 -- ADC0
- * channel = 1 -- ADC1 (Voltage at J407 divided by ~5)
+ * channel = 1 -- ADC1 (Voltage at J407 divided by 6)
  * ...
  * channel = 7 -- ADC7
  *
@@ -251,8 +250,8 @@ void adc_report(uint16_t repdata) {
     sprintf(s,"%x ",repdata);
     usart_puts(s); // Send to the USART
     usart_puts("\r\n");
-    //sprintf(s,"0x%x",repdata);
-    //lcd_puts(s,0); // Send to the LCD
+    sprintf(s,"0x%x",repdata);
+    lcd_puts(s,0); // Send to the LCD
 }
 
 /* usart_init()
@@ -402,7 +401,7 @@ void fosc_cal(void) {
  * not?  We define the mcu name to be atmega169p in the makefile, not
  * atmega169pa. */
 ISR(SIG_OUTPUT_COMPARE0) {
-    led(ON);
+    // led(ON);
     /* The interrupt code goes here. */
-    led(OFF);
+    // led(OFF);
 }
