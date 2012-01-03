@@ -1,0 +1,83 @@
+;
+; Init file for gEDA
+;
+
+;  ;'s are comments
+;  keywords are case sensitive (guile feature)
+;  mode strings are case sensitive
+;  colors are not case sensitive
+
+; The following lines deal with attribute promotion.  When you update
+; a schematic symbol file, attributes that have been promoted to the 
+; schematic won't be updated (the graphical parts always will).
+(attribute-promotion "enabled") ; Needed to promote the refdes
+(keep-invisible "enabled") ; Don't make invisible visable even when promoted
+(always-promote-attributes '("refdes")) ; Only promote these attributes.
+
+
+
+; Add the jpeda component libraries.  Resetting the library list allows
+; the custom libraries to come first in the part selection dialog box
+; for gschem
+(reset-component-library)
+(component-library "../../jpeda/symbols/resistors")
+(component-library "../../jpeda/symbols/regulators")
+(component-library "../../jpeda/symbols/capacitors")
+(component-library "../../jpeda/symbols/ics")
+(component-library "../../jpeda/symbols/transistors")
+(component-library "../../jpeda/symbols/power")
+(component-library "../../jpeda/symbols/connectors")
+(component-library "../../jpeda/symbols/diodes")
+(component-library "../../jpeda/symbols/inductors")
+(component-library "../../jpeda/symbols/io")
+(component-library "../../jpeda/symbols/nonelectrics")
+(component-library "../../jpeda/symbols/title")
+
+; (Optional) Add the canned gschem symbols
+;(component-library "/usr/share/gEDA/sym/4000")
+;(component-library "/usr/share/gEDA/sym/74")
+;(component-library "/usr/share/gEDA/sym/IEC417")
+;(component-library "/usr/share/gEDA/sym/allegro")
+;(component-library "/usr/share/gEDA/sym/altera")
+;(component-library "/usr/share/gEDA/sym/amphenol")
+;(component-library "/usr/share/gEDA/sym/analog")
+;(component-library "/usr/share/gEDA/sym/apex")
+;(component-library "/usr/share/gEDA/sym/asic")
+;(component-library "/usr/share/gEDA/sym/asicpads")
+;(component-library "/usr/share/gEDA/sym/bus")
+;(component-library "/usr/share/gEDA/sym/cascade")
+;(component-library "/usr/share/gEDA/sym/connector")
+;(component-library "/usr/share/gEDA/sym/dec")
+;(component-library "/usr/share/gEDA/sym/diode")
+;(component-library "/usr/share/gEDA/sym/ecl")
+;(component-library "/usr/share/gEDA/sym/font")
+;(component-library "/usr/share/gEDA/sym/idt")
+;(component-library "/usr/share/gEDA/sym/io")
+;(component-library "/usr/share/gEDA/sym/irf")
+;(component-library "/usr/share/gEDA/sym/lattice")
+;(component-library "/usr/share/gEDA/sym/linear")
+;(component-library "/usr/share/gEDA/sym/local")
+;(component-library "/usr/share/gEDA/sym/maxim")
+;(component-library "/usr/share/gEDA/sym/memory")
+;(component-library "/usr/share/gEDA/sym/micro")
+;(component-library "/usr/share/gEDA/sym/minicircuits")
+;(component-library "/usr/share/gEDA/sym/misc")
+;(component-library "/usr/share/gEDA/sym/national")
+;(component-library "/usr/share/gEDA/sym/opto")
+;(component-library "/usr/share/gEDA/sym/philips")
+;(component-library "/usr/share/gEDA/sym/pla")
+;(component-library "/usr/share/gEDA/sym/power")
+;(component-library "/usr/share/gEDA/sym/radio")
+;(component-library "/usr/share/gEDA/sym/relay")
+;(component-library "/usr/share/gEDA/sym/rf")
+;(component-library "/usr/share/gEDA/sym/spice")
+;(component-library "/usr/share/gEDA/sym/st")
+;(component-library "/usr/share/gEDA/sym/supervisor")
+;(component-library "/usr/share/gEDA/sym/switcap")
+;(component-library "/usr/share/gEDA/sym/switch")
+;(component-library "/usr/share/gEDA/sym/titleblock")
+;(component-library "/usr/share/gEDA/sym/transistor")
+;(component-library "/usr/share/gEDA/sym/tube")
+;(component-library "/usr/share/gEDA/sym/verilog")
+;(component-library "/usr/share/gEDA/sym/vhdl")
+;(component-library "/usr/share/gEDA/sym/xilinx")
