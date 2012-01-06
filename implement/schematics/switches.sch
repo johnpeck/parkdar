@@ -17,40 +17,40 @@ C 39600 41600 1 0 0 dg419l-a.sym
 T 41601 41851 5 10 1 1 0 0 1
 value=DG419L
 T 41601 42041 5 10 1 1 0 0 1
-refdes=U?
+refdes=U100
 }
 C 37700 35900 1 0 0 dg419l-b.sym
 {
 T 39194 36400 5 10 1 1 0 0 1
-refdes=U?
+refdes=U101
 T 39201 36201 5 10 1 1 0 0 1
 value=DG419L
 }
 C 36700 42100 1 0 0 bnc_pcb_in.sym
 {
 T 36700 42800 5 10 1 1 0 0 1
-refdes=J?
+refdes=J100
 T 37100 42376 5 10 1 1 0 0 1
 value=bnc
 }
 C 39200 42800 1 0 0 10k0_1206_vert.sym
 {
 T 39500 43500 5 10 1 1 0 0 1
-refdes=R?
+refdes=R100
 T 39500 43300 5 10 1 1 0 0 1
 value=10.0k
 }
 C 39200 41200 1 0 0 10k0_1206_vert.sym
 {
 T 39500 41900 5 10 1 1 0 0 1
-refdes=R?
+refdes=R101
 T 39500 41700 5 10 1 1 0 0 1
 value=10.0k
 }
 C 36900 42200 1 0 0 1n0_x7r_500v_1206_horz.sym
 {
 T 38200 42900 5 10 1 1 0 0 1
-refdes=C?
+refdes=C100
 T 38100 42200 5 10 1 1 0 0 1
 value=1.0n
 }
@@ -62,14 +62,14 @@ C 35000 37500 1 0 0 3v3_pos.sym
 C 35000 37200 1 0 0 10r0_1206_horz.sym
 {
 T 36300 37700 5 10 1 1 0 0 1
-refdes=R?
+refdes=R102
 T 36300 37200 5 10 1 1 0 0 1
 value=10
 }
 C 37100 36100 1 0 0 1u0_x7r_50v_1206_vert.sym
 {
 T 37600 36700 5 10 1 1 0 0 1
-refdes=C?
+refdes=C101
 T 37600 36500 5 10 1 1 0 0 1
 value=1.0u
 }
@@ -93,7 +93,7 @@ C 39300 39100 1 0 0 2pin_mta100_header_in_ra.sym
 T 39300 39300 5 10 1 1 0 0 1
 value=mta100
 T 39300 40200 5 10 1 1 0 0 1
-refdes=J?
+refdes=J102
 T 39300 39100 5 10 1 1 0 0 1
 comment=Right angle
 }
@@ -110,7 +110,7 @@ N 40601 42600 40601 42601 4
 C 43400 41900 1 0 0 bnc_pcb_out.sym
 {
 T 43700 42700 5 10 1 1 0 0 1
-refdes=J?
+refdes=J101
 T 43700 42536 5 10 1 1 0 0 1
 value=bnc
 }
@@ -121,7 +121,7 @@ N 41801 42400 41801 42401 4
 C 37100 39300 1 0 0 2pin_mta100_white_recept.sym
 {
 T 37500 40000 5 10 1 1 0 0 1
-refdes=MECH?
+refdes=MECH101
 T 37500 39800 5 10 1 1 0 0 1
 value=mta100
 T 37500 39600 5 10 1 1 0 0 1
@@ -132,7 +132,7 @@ comment=24-guage stranded
 C 34900 39300 1 0 0 2pin_mta100_white_recept.sym
 {
 T 35300 40000 5 10 1 1 0 0 1
-refdes=MECH?
+refdes=MECH100
 T 35300 39800 5 10 1 1 0 0 1
 value=mta100
 T 35300 39600 5 10 1 1 0 0 1
@@ -147,7 +147,7 @@ C 46600 37500 1 0 0 2pin_mta100_header_in_ra.sym
 T 46600 37700 5 10 1 1 0 0 1
 value=mta100
 T 46600 38600 5 10 1 1 0 0 1
-refdes=J?
+refdes=J103
 T 46600 37500 5 10 1 1 0 0 1
 comment=Right angle
 }
@@ -160,7 +160,7 @@ N 47800 38000 47800 37600 4
 C 44400 37600 1 0 0 2pin_mta100_white_recept.sym
 {
 T 44800 38300 5 10 1 1 0 0 1
-refdes=MECH?
+refdes=MECH103
 T 44800 38100 5 10 1 1 0 0 1
 value=mta100
 T 44800 37900 5 10 1 1 0 0 1
@@ -171,7 +171,7 @@ comment=24-guage stranded
 C 42100 37600 1 0 0 2pin_mta100_white_recept.sym
 {
 T 42500 38300 5 10 1 1 0 0 1
-refdes=MECH?
+refdes=MECH102
 T 42500 38100 5 10 1 1 0 0 1
 value=mta100
 T 42500 37900 5 10 1 1 0 0 1
