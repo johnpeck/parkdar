@@ -32,6 +32,7 @@
 (component-library "../../jpeda/symbols/io")
 (component-library "../../jpeda/symbols/nonelectrics")
 (component-library "../../jpeda/symbols/title")
+(component-library "../../jpeda/symbols/modules")
 
 ; (Optional) Add the canned gschem symbols
 ;(component-library "/usr/share/gEDA/sym/4000")
