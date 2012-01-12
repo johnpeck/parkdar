@@ -17,19 +17,19 @@ C 43500 40100 1 0 0 lv_maxsonar_ez0.sym
 T 45300 40100 5 10 1 1 0 0 1
 value=LV-MaxSonar-EZ0
 T 45300 40300 5 10 1 1 0 0 1
-refdes=MOD?
+refdes=MOD200
 }
 C 42100 39700 1 0 0 6pin_mta100_header_in_ra.sym
 {
 T 42100 39700 5 10 1 1 0 0 1
 value=mta100
 T 42100 42300 5 10 1 1 0 0 1
-refdes=J?
+refdes=J200
 }
 C 40000 40600 1 0 0 6pin_mta100_white_recept.sym
 {
 T 40400 41300 5 10 1 1 0 0 1
-refdes=MECH?
+refdes=MECH201
 T 40400 41100 5 10 1 1 0 0 1
 value=mta100
 T 40400 40900 5 10 1 1 0 0 1
@@ -40,7 +40,7 @@ comment=24-guage stranded
 C 36600 42100 1 0 0 2pin_mta100_white_recept.sym
 {
 T 37000 42800 5 10 1 1 0 0 1
-refdes=MECH?
+refdes=MECH200
 T 37000 42600 5 10 1 1 0 0 1
 value=mta100
 T 37000 42400 5 10 1 1 0 0 1
@@ -51,7 +51,7 @@ comment=24-guage stranded
 C 36600 38500 1 0 0 2pin_mta100_white_recept.sym
 {
 T 37000 39200 5 10 1 1 0 0 1
-refdes=MECH?
+refdes=MECH202
 T 37000 39000 5 10 1 1 0 0 1
 value=mta100
 T 37000 38800 5 10 1 1 0 0 1
