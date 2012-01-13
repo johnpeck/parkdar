@@ -22,7 +22,7 @@ refdes=U100
 C 37700 35900 1 0 0 dg419l-b.sym
 {
 T 39194 36400 5 10 1 1 0 0 1
-refdes=U101
+refdes=U100
 T 39201 36201 5 10 1 1 0 0 1
 value=DG419L
 }
