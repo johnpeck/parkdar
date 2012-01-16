@@ -399,8 +399,10 @@ void fosc_cal(void) {
 /* Interrupt
  * Find the name of this interrupt signal in iom169p.h and not pa.  Why
  * not?  We define the mcu name to be atmega169p in the makefile, not
- * atmega169pa. */
-ISR(SIG_OUTPUT_COMPARE0) {
+ * atmega169pa. See the naming convention outlined at
+ * http://www.nongnu.org/avr-libc/user-manual/group__avr__interrupts.html
+ * to make sure you don't use depricated names. */
+ISR(TIMER0_COMP_vect) {
     // led(ON);
     /* The interrupt code goes here. */
     // led(OFF);
