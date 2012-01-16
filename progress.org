@@ -6,3 +6,4 @@
 * TODO Change references to LED in the code
   - The LED is now at PB6. The idea was that I'll never use OC1B.
   - Also update the drawing to point to where LED goes.
+* TODO Order cheap license plate frame
