@@ -46,18 +46,18 @@ int main(void) {
  * 0 -- LED turns off */
  void led(uint8_t state) {
     if (state == 1)
-        PORTB |= _BV(PB4);
+        PORTB |= _BV(PB6);
     else
-        PORTB &= ~(_BV(PB4));
+        PORTB &= ~(_BV(PB6));
 }
 
 /* portb_init()
- * I have an LED at PB4, and I'm using it as the output compare pin
- *     for timer0.
  * I'm using PB7 as the output compare pin for timer2 */
 void portb_init(void) {
     DDRB |= (1<<DDB4); // Set bit 4 of port B for output
+    DDRB |= (1<<DDB6); // Set bit 6 of port B for output (debug LED)
     DDRB |= (1<<DDB7); // Set bit 7 of port B for output
+    
 }
 
 /* timer2_init()
