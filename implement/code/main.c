@@ -17,8 +17,7 @@
 #define OFF 0
 
 int main(void) {
-    uint16_t adc_data = 0;
-    
+    uint16_t adc_data = 0; // Allow for up to 64 averages
     sei(); // Enable interrupts
     fosc_cal(); // Set calibrated 1MHz system clock
     portb_init(); // Set up port B
@@ -175,7 +174,8 @@ void usart_puts(char s[]) {
     }
 }
 
-/* Initialize the ADC.  */
+/* Initialize the ADC.  The butterfly has a 10-bit ADC multiplexed
+ * into 8 channels. */
 void adc_init(void) {
     /* The butterfly has Vcc connected to AVcc via a low-pass filter.
      * It also has a shunt capacitor at the Aref pin.  So I can use the
@@ -225,11 +225,22 @@ void adc_mux(uint8_t channel) {
     ADMUX |= channel;
 }
 
-/* adc_read() 
- * Reads raw data from the ADC selected by adc_mux(). */
-void adc_read(uint16_t *adc_data) {
+/* adc_read(pointer to adc data, number of averages) 
+ * Reads raw data from the ADC selected by adc_mux().  The number of
+ * averages will be changed to the nearest power of 2 not larger
+ * than 64. */
+void adc_read(uint16_t *adc_data, uint8_t averages) {
     uint16_t adc_temp = 0;
-
+    uint8_t numshift = 0; // Number of shifts for averaging
+    if (averages > 64)
+        numshift = 6;
+    else {
+        averages = averages >> 1;
+        while (averages != 0) {
+            averages >> 1
+            numshift++
+        }
+    }
     /* Enable the ADC.  It seems like I already did this in adc_init(),
      * but the part locks up if I don't also do it here. */
     ADCSRA |= _BV(ADEN);
