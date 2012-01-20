@@ -229,26 +229,37 @@ void adc_mux(uint8_t channel) {
  * Reads raw data from the ADC selected by adc_mux().  The number of
  * averages will be changed to the nearest power of 2 not larger
  * than 64. */
-void adc_read(uint16_t *adc_data, uint8_t averages) {
+void adc_read(uint16_t *adc_data, uint8_t avgnum) {
     uint16_t adc_temp = 0;
     uint8_t numshift = 0; // Number of shifts for averaging
+    uint16_t sum = 0;
+    uint16_t average = 0;
+    uint8_t powcount = 0; // Counter for determining power of 2
+    uint8_t avgshift = avgnum >> 1;
+    /* Determine the closest power of 2 to use for averaging.
+     * powcount will be this number. */
     if (averages > 64)
-        numshift = 6;
+        avgshift = 6; // Limit to maximum of 64 averaged readings
     else {
-        averages = averages >> 1;
-        while (averages != 0) {
-            averages >> 1
-            numshift++
-        }
-    }
+        while (avgshift != 0) {
+            powcount++;
+            avgshift = avgshift >> 1;
+        };
+    };
+    usart_puts("Closest power of 2 is %d\n",powcount);
     /* Enable the ADC.  It seems like I already did this in adc_init(),
      * but the part locks up if I don't also do it here. */
     ADCSRA |= _BV(ADEN);
-
-    ADCSRA |= (1<<ADSC);  // do single conversion
-    while(!(ADCSRA & (1<<ADIF)));  // wait for conversion to finish
-    adc_temp = ADCL;            // read out ADCL register
-    adc_temp += (ADCH << 8);    // read out ADCH register
+    
+    /* Read from the ADC.  This will only run once if powcount = 0. */
+    for (uint8_t count = 0; count < (1 << powcount); count++) {
+        ADCSRA |= (1<<ADSC);  // do single conversion
+        while(!(ADCSRA & (1<<ADIF)));  // wait for conversion to finish
+        adc_temp = ADCL;            // read out ADCL register
+        adc_temp += (ADCH << 8);    // read out ADCH register
+        sum += adc_temp;
+    };
+    average = sum >> powcount;
     *adc_data = adc_temp;
 }
 
