@@ -18,10 +18,10 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=2
+current_page=6
 FILE_NAME_0=16659;Make;0;16;1;1;0;/home/john/projects/parkdar/implement/code/makefile;0;4
-FILE_NAME_1=463;C;0;16;0;1;0;/home/john/projects/parkdar/implement/code/main.h;0;4
-FILE_NAME_2=8849;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/main.c;0;4
+FILE_NAME_1=527;C;0;16;0;1;0;/home/john/projects/parkdar/implement/code/main.h;0;4
+FILE_NAME_2=9752;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/main.c;0;4
 FILE_NAME_3=2135;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/LCD_functions.c;0;4
 FILE_NAME_4=0;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/LCD_driver.c;0;4
 FILE_NAME_5=0;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/proto/proto.c;0;4

@@ -10,14 +10,17 @@
 #include "LCD_functions.h"
 
 /* Global variables */
-
+const int16_t cal_slop = -3; // Slope calibration factor for rangefinder
+const int16_t cal_offs = 0x47; // Offset calibration factor for rangefinder
+volatile uint8_t doread = 0; // Report ADC data when doread is set in interrupt
 
 /* Definitions for led() */
 #define ON 1
 #define OFF 0
 
+
 int main(void) {
-    uint16_t adc_data = 0; // Allow for up to 64 averages
+    int16_t adc_data = 0; // Allow for up to 64 averages
     sei(); // Enable interrupts
     fosc_cal(); // Set calibrated 1MHz system clock
     portb_init(); // Set up port B
@@ -33,13 +36,18 @@ int main(void) {
     timer2_start(); // Start stimulus
     adc_mux(1); // Switch to the voltage reader at J407
     for(;;) {
-        adc_read(&adc_data);
-        adc_report(adc_data);
-        OCR0A = (uint8_t)(adc_data);
+        if (doread == 1) {
+            led(ON);
+            adc_read(&adc_data,64);
+            adc_report(adc_data);
+            range_report(&adc_data);
+            doread = 0;
+        }
+        else led(OFF);
     }// end main for loop
 } // end main
 
-/* led()
+/* led(desired state)
  * Turns the led on or off
  * 1 -- LED turns on
  * 0 -- LED turns off */
@@ -56,7 +64,6 @@ void portb_init(void) {
     DDRB |= (1<<DDB4); // Set bit 4 of port B for output
     DDRB |= (1<<DDB6); // Set bit 6 of port B for output (debug LED)
     DDRB |= (1<<DDB7); // Set bit 7 of port B for output
-    
 }
 
 /* timer2_init()
@@ -116,20 +123,20 @@ void timer2_stop(void) {
 }
 
 /* timer0_init() 
- * This timer will supply the modulation tone pulses that will indicate
- * the proximity of an obstacle.  It should be set up for phase-correct
- * PWM mode.  This init function will both set up and start the timer. */
+ * This timer will cause the distance to be printed to the usart at
+ * a certain frequency.  The range will be reported on timer0 
+ * overflows. */
 void timer0_init(void) {
-    /* Set timer0 prescaler and set phase-correct PWM mode (WGM 01).
+    /* Set timer0 prescaler and set clear on timer compare match
+     *    (CTC mode, WGM 10).
      * Prescalers:
      * 100 -- fc/256 for ~130ms period
      * 101 -- fc/1024 for ~512ms period */
-    TCCR0A = (1<<CS02) | (0<<CS01) | (1<<CS00) | (0<<WGM01) | (1<<WGM00);
-    /* Set compare output mode to clear the 0C0A pin after an up-counting 
-     * match, and set it after a down-counting match. */
-    TCCR0A |= (1<<COM0A1) | (0<<COM0A0);
+    TCCR0A = (1<<CS02) | (0<<CS01) | (1<<CS00) | (1<<WGM01) | (0<<WGM00);
+    /* Disconnect the 0C0A pin */
+    TCCR0A |= (0<<COM0A1) | (0<<COM0A0);
     /* Set timer0's initial output compare register */
-    OCR0A = 25;
+    OCR0A = 250;
     /* Clear timer0 interrupt flags */
     TIFR0 = 0;
     /* Enable output compare match interrupt. */
@@ -229,16 +236,17 @@ void adc_mux(uint8_t channel) {
  * Reads raw data from the ADC selected by adc_mux().  The number of
  * averages will be changed to the nearest power of 2 not larger
  * than 64. */
-void adc_read(uint16_t *adc_data, uint8_t avgnum) {
-    uint16_t adc_temp = 0;
-    uint8_t numshift = 0; // Number of shifts for averaging
-    uint16_t sum = 0;
-    uint16_t average = 0;
+void adc_read(int16_t *adc_data, uint8_t avgnum) {
+    int16_t adc_temp = 0;
+    int16_t sum = 0;
+    int16_t average = 0;
     uint8_t powcount = 0; // Counter for determining power of 2
+    char debugstr[50]; // For debug output on usart
     uint8_t avgshift = avgnum >> 1;
+    uint8_t retval;
     /* Determine the closest power of 2 to use for averaging.
      * powcount will be this number. */
-    if (averages > 64)
+    if (avgnum > 64)
         avgshift = 6; // Limit to maximum of 64 averaged readings
     else {
         while (avgshift != 0) {
@@ -246,7 +254,6 @@ void adc_read(uint16_t *adc_data, uint8_t avgnum) {
             avgshift = avgshift >> 1;
         };
     };
-    usart_puts("Closest power of 2 is %d\n",powcount);
     /* Enable the ADC.  It seems like I already did this in adc_init(),
      * but the part locks up if I don't also do it here. */
     ADCSRA |= _BV(ADEN);
@@ -258,23 +265,39 @@ void adc_read(uint16_t *adc_data, uint8_t avgnum) {
         adc_temp = ADCL;            // read out ADCL register
         adc_temp += (ADCH << 8);    // read out ADCH register
         sum += adc_temp;
-    };
+    }
     average = sum >> powcount;
     *adc_data = adc_temp;
 }
 
 /* adc_report()
  * Writes the ADC value to the USART and the LCD */
-void adc_report(uint16_t repdata) {
+void adc_report(int16_t repdata) {
     char s[10];
 
     //usart_puts("The ADC value is 0x");
     sprintf(s,"%x ",repdata);
     usart_puts(s); // Send to the USART
     usart_puts("\r\n");
-    sprintf(s,"0x%x",repdata);
-    lcd_puts(s,0); // Send to the LCD
 }
+
+/* range_report()
+ * Applies calibration factors and sends distance information to the
+ * usart and the lcd */
+ void range_report(int16_t *adc_data) {
+     char uncal_string[30];
+     int16_t range = 0; // The calibrated range result
+     char cal_string[30];
+     uint8_t retval;
+     range = cal_slop * (*adc_data - cal_offs);
+     retval = sprintf(uncal_string,"Uncalibrated: 0x%x\r\n",*adc_data);
+     usart_puts(uncal_string);
+     retval = sprintf(cal_string,"Calibrated: %d in\r\n",range);
+     usart_puts(cal_string);
+     retval = sprintf(cal_string,"%din",range);
+     lcd_puts(cal_string,0);
+ }
+     
 
 /* usart_init()
  * Initialize the USART.  The butterfly only has one USART, so all the
@@ -425,7 +448,6 @@ void fosc_cal(void) {
  * http://www.nongnu.org/avr-libc/user-manual/group__avr__interrupts.html
  * to make sure you don't use depricated names. */
 ISR(TIMER0_COMP_vect) {
-    // led(ON);
     /* The interrupt code goes here. */
-    // led(OFF);
+    doread = 1;
 }
