@@ -1,3 +1,5 @@
+* parkdar events and tasks
+*------------- Events -----------------
 * <2011-12-30 Fri> Created this project.
 * <2012-01-01 Sun> Created minicom configuration.
   - As long as the FTDI dongle enumerates as /dev/ttyUSB0, simply starting minicom with "minicom parkdar" will bring up the terminal with all the right settings.  I had to configure minicom as root to set this configuration.
@@ -5,6 +7,7 @@
 * <2012-01-18 Wed> Created the ranger branch
   - This branch will just exist to demonstrate the rangefinder.
 
+*------------- Tasks ------------------
 * DONE Change references to LED in the code
   - The LED is now at PB6. The idea was that I'll never use OC1B.
   - Also update the drawing to point to where LED goes.
@@ -20,3 +23,6 @@
 * TODO Connect mta100 header to J402
   - This is for ADC4 as shown in the [[file:implement/drawings/butterfly_connect.fig][drawing]].
 * TODO Modify code to select ADC4 as analog input.
+* TODO Stock pencils power supply rise time is too slow
+** The fix is to replace C402 with 3.3nF (11-10).  This speeds up the output rise time to about 1.5V/ms, which is fast enough to activate the atmega169's power-on reset.
+* TODO Order water-clean flux remover pen			   :mcmaster:
