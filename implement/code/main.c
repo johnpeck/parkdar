@@ -34,7 +34,7 @@ int main(void) {
     usart_puts("Start main loop\r\n");
     lcd_puts("Hello",0); // From LCD_functions
     timer2_start(); // Start stimulus
-    adc_mux(1); // Switch to the voltage reader at J407
+    adc_mux(4); // Switch to ADC4
     for(;;) {
         if (doread == 1) {
             led(ON);
@@ -222,7 +222,11 @@ void adc_init(void) {
 /* Set the mux channel for the ADC input.
  * channel = 0 -- ADC0
  * channel = 1 -- ADC1 (Voltage at J407 divided by 6)
- * ...
+ * channel = 2 -- ?
+ * channel = 3 -- ?
+ * channel = 4 -- ADC4 (Voltage at J402:1)
+ * channel = 5 -- ?
+ * channel = 6 -- ?
  * channel = 7 -- ADC7
  *
  * The mux selection overrides any data direction selection made with
