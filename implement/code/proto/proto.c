@@ -47,5 +47,6 @@ int main()
     puts("Hello World!");
     looper(myarray);
     printf("Average value is %d\n",getavg(myarray,2));
+    printf("Five over 2 is %0.3f\n",(0.5*5));
     return 0;
 }

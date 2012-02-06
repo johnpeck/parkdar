@@ -10,8 +10,9 @@
 #include "LCD_functions.h"
 
 /* Global variables */
-const int16_t cal_slop = -3; // Slope calibration factor for rangefinder
-const int16_t cal_offs = 0x47; // Offset calibration factor for rangefinder
+/* Calibration slope is in mils per count */
+const int16_t cal_slop = -500; // Slope calibration factor for rangefinder
+const int16_t cal_offs = 0x1c3; // Offset calibration factor for rangefinder
 volatile uint8_t doread = 0; // Report ADC data when doread is set in interrupt
 
 /* Definitions for led() */
@@ -39,7 +40,6 @@ int main(void) {
         if (doread == 1) {
             led(ON);
             adc_read(&adc_data,64);
-            adc_report(adc_data);
             range_report(&adc_data);
             doread = 0;
         }
@@ -278,7 +278,6 @@ void adc_read(int16_t *adc_data, uint8_t avgnum) {
  * Writes the ADC value to the USART and the LCD */
 void adc_report(int16_t repdata) {
     char s[10];
-
     //usart_puts("The ADC value is 0x");
     sprintf(s,"%x ",repdata);
     usart_puts(s); // Send to the USART
@@ -293,7 +292,7 @@ void adc_report(int16_t repdata) {
      int16_t range = 0; // The calibrated range result
      char cal_string[30];
      uint8_t retval;
-     range = cal_slop * (*adc_data - cal_offs);
+     range = (cal_slop * (*adc_data - cal_offs))/1000;
      retval = sprintf(uncal_string,"Uncalibrated: 0x%x\r\n",*adc_data);
      usart_puts(uncal_string);
      retval = sprintf(cal_string,"Calibrated: %d in\r\n",range);
