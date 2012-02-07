@@ -1,0 +1,12 @@
+* Kickstarter proposal
+** What is your project? (750 characters)
+   - Parkdar is a technology product using sonar to help you park your car.  Unlike more elaborate solutions for this, Parkdar communicates with the driver via the car's AM radio.  Distances from about 1m down to 15cm are reported with varying pulse lengths of a constant tone.  The pulses lengthen as the detected obstacle range decreases, with the shortest distances simply giving an uninterrupted tone.  The tones can be customized, so that you can have multiple sensors mounted in different places.  The sensors do not have to be on your car -- they can be mounted on any obstacle you'd like your car to avoid.   
+** What rewards would you offer? (1000 characters)
+*** $10 rewards
+    - This car protected by Parkdar sticker.
+*** $20 rewards
+    - ???
+*** $50 rewards
+    - ???
+*** $100 rewards
+    - One Parkdar sensor.
