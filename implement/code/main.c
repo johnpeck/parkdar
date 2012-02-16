@@ -21,6 +21,7 @@ volatile uint8_t doread = 0; // Report ADC data when doread is set in interrupt
 
 
 int main(void) {
+
     int16_t adc_data = 0; // Allow for up to 64 averages
     sei(); // Enable interrupts
     fosc_cal(); // Set calibrated 1MHz system clock
@@ -315,10 +316,11 @@ void usart_init(void) {
     /* Set double speed mode. */
     UCSR0A = (1<<U2X0);
 
-    /* Enable the receiver and transmitter.  Leave an option to enable
-     * the receive complete interrupt enable and the data register
-     * empty interrupt enable. */
-    UCSR0B = (1<<RXEN0)|(1<<TXEN0)|(0<<RXCIE0)|(0<<UDRIE0);
+    /* Enable the receiver and transmitter.  
+     * Enable interrupts from the RXC flag (receive complete).
+     * Leave an option to enable interrupts from the TXC flag (transmit complete).
+     * Leave an option to enable interrupts on data register empty */
+    UCSR0B = (1<<RXEN0)|(1<<TXEN0)|(1<<RXCIE0)|(0<<TXCIE0)|(0<<UDRIE0);
 
     /* Set the USART to asynchronous at 8 bits no parity and 1 stop bit */
     UCSR0C = (0<<UMSEL0)|(0<<UPM00)|(0<<USBS0)|(3<<UCSZ00)|(0<<UCPOL0);
@@ -447,10 +449,19 @@ void fosc_cal(void) {
 /* Interrupt
  * Find the name of this interrupt signal in iom169p.h and not pa.  Why
  * not?  We define the mcu name to be atmega169p in the makefile, not
- * atmega169pa. See the naming convention outlined at
+ * atmega169pa. 
+ * 
+ * See the naming convention outlined at
  * http://www.nongnu.org/avr-libc/user-manual/group__avr__interrupts.html
  * to make sure you don't use depricated names. */
 ISR(TIMER0_COMP_vect) {
     /* The interrupt code goes here. */
     doread = 1;
+}
+
+/* USART receive character interrupt */
+ISR(USART0_RX_vect) {
+    char RxByte;
+    RxByte = UDR0;
+    UDR0 = RxByte; // Echo back the received byte
 }

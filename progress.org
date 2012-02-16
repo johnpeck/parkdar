@@ -24,14 +24,15 @@
 * DONE Connect mta100 header to J402
   - This is for ADC4 as shown in the [[file:implement/drawings/butterfly_connect.fig][drawing]].
 * DONE Modify code to select ADC4 as analog input.
-* TODO Add command parser for two commands
+* TODO Add command parser for two commands [/]
 ** range?
 *** Returns calibrated range in inches from one of the latest measurements
 ** uncal?
 *** Returns uncalibrated ADC counts from one of the latest measurements
+** TODO Add #defines for USART baud and baud divider
+   - See [[file:datasheets/InterruptUSART.pdf][USART interrupt pdf]].
 * TODO Adjust one pencil channel's offset to 3.3V
 * TODO Stock pencils power supply rise time is too slow
 ** The fix is to replace C402 with 3.3nF (11-10).  This speeds up the output rise time to about 1.5V/ms, which is fast enough to activate the atmega169's power-on reset.
 ** Don't mark this as done until there's another revision of the power supply hardware.
 * TODO Order water-clean flux remover pen			   :mcmaster:
-* TODO 
