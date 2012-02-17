@@ -316,11 +316,11 @@ void usart_init(void) {
     /* Set double speed mode. */
     UCSR0A = (1<<U2X0);
 
-    /* Enable the receiver and transmitter.  
-     * Enable interrupts from the RXC flag (receive complete).
-     * Leave an option to enable interrupts from the TXC flag (transmit complete).
-     * Leave an option to enable interrupts on data register empty */
-    UCSR0B = (1<<RXEN0)|(1<<TXEN0)|(1<<RXCIE0)|(0<<TXCIE0)|(0<<UDRIE0);
+    /* Configure USART control register B */
+    UCSR0B = (1<<RXEN0)|(1<<TXEN0); // Enable receiver and transmitter.
+    UCSR0B |= (1<<RXCIE0); // Enable receive complete interrupts.
+    UCSR0B |= (0<<TXCIE0); // Enable transmit complete interrupts (not right now).
+    UCSR0B |= (0<<UDRIE0); // Enable data registter empty interrupts (not right now).
 
     /* Set the USART to asynchronous at 8 bits no parity and 1 stop bit */
     UCSR0C = (0<<UMSEL0)|(0<<UPM00)|(0<<USBS0)|(3<<UCSZ00)|(0<<UCPOL0);
