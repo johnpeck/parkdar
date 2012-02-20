@@ -16,6 +16,7 @@ void usart_puts(char *);
 void usart_init(void);
 unsigned char usart_receive(void);
 void led(uint8_t state);
+void scanRx(void);
 void timer0_init(void);
 void timer0_start(void);
 void timer0_stop(void);

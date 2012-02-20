@@ -1,13 +1,14 @@
-* parkdar events and tasks
-*------------- Events -----------------
+* parkdar progress
+* ----------------------- Dated notes ---------------------------
 * <2011-12-30 Fri> Created this project.
 * <2012-01-01 Sun> Created minicom configuration.
   - As long as the FTDI dongle enumerates as /dev/ttyUSB0, simply starting minicom with "minicom parkdar" will bring up the terminal with all the right settings.  I had to configure minicom as root to set this configuration.
-
 * <2012-01-18 Wed> Created the ranger branch
   - This branch will just exist to demonstrate the rangefinder.
 
 *------------- Tasks ------------------
+* <2012-02-18 Sat> Created puTTy configuration
+* ------------------------ TODO list ----------------------------
 * DONE Change references to LED in the code
   - The LED is now at PB6. The idea was that I'll never use OC1B.
   - Also update the drawing to point to where LED goes.

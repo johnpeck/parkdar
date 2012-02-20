@@ -9,11 +9,18 @@
 #include "LCD_driver.h"
 #include "LCD_functions.h"
 
+/* Define the size of the receive character buffer */
+#define RXBUFFERSIZE 20
+
 /* Global variables */
 /* Calibration slope is in mils per count */
 const int16_t cal_slop = -500; // Slope calibration factor for rangefinder
 const int16_t cal_offs = 0x1c3; // Offset calibration factor for rangefinder
 volatile uint8_t doread = 0; // Report ADC data when doread is set in interrupt
+volatile char rxBuffer[RXBUFFERSIZE]; // Received character buffer
+char * rxStartPtr = rxBuffer; // Always points to start of buffer
+volatile char * rxScanPtr = rxBuffer; // Walks through buffer for scanning
+volatile char * rxWritePtr = rxBuffer; // Walks through buffer for writing
 
 /* Definitions for led() */
 #define ON 1
@@ -21,7 +28,7 @@ volatile uint8_t doread = 0; // Report ADC data when doread is set in interrupt
 
 
 int main(void) {
-
+    memset(rxBuffer,0,RXBUFFERSIZE);
     int16_t adc_data = 0; // Allow for up to 64 averages
     sei(); // Enable interrupts
     fosc_cal(); // Set calibrated 1MHz system clock
@@ -45,6 +52,8 @@ int main(void) {
             doread = 0;
         }
         else led(OFF);
+        scanRx();
+        
     }// end main for loop
 } // end main
 
@@ -58,6 +67,36 @@ int main(void) {
     else
         PORTB &= ~(_BV(PB6));
 }
+
+/* scanRx()
+ * Look at received character buffer to see if:
+ * 1. Anything terminated by a \r has shown up.  This is a command and
+ *    should be processed.
+ * 2. The buffer is almost full without a \r showing up.  The buffer
+ *    should just be cleared. */
+void scanRx(void) {
+    char rxToken[20];
+    char outStr[40];
+    uint8_t retval = 0;
+    memset(rxToken,0,20);
+    /* Scan the command buffer for first occurance of \r */
+    char * termPtr = strchr(rxBuffer,'\r'); // Finds command terminator
+    if (termPtr != NULL) {
+        int count = 0;
+        while (rxScanPtr != termPtr) {
+            rxToken[count] = *rxScanPtr;
+            rxScanPtr++;
+            count++;
+        };
+        retval = sprintf(outStr,"The found token is %s\r\n",rxToken);
+        usart_puts(outStr);
+        memset(rxBuffer,0,RXBUFFERSIZE); // Re-initialize the receive buffer
+        rxScanPtr = rxStartPtr; // Move the scanning pointer back to the beginning
+        rxWritePtr = rxStartPtr; // Move writing back to the beginning
+    };
+
+}
+
 
 /* portb_init()
  * I'm using PB7 as the output compare pin for timer2 */
@@ -295,9 +334,9 @@ void adc_report(int16_t repdata) {
      uint8_t retval;
      range = (cal_slop * (*adc_data - cal_offs))/1000;
      retval = sprintf(uncal_string,"Uncalibrated: 0x%x\r\n",*adc_data);
-     usart_puts(uncal_string);
+     // usart_puts(uncal_string);
      retval = sprintf(cal_string,"Calibrated: %d in\r\n",range);
-     usart_puts(cal_string);
+     // usart_puts(cal_string);
      retval = sprintf(cal_string,"%din",range);
      lcd_puts(cal_string,0);
  }
@@ -461,7 +500,7 @@ ISR(TIMER0_COMP_vect) {
 
 /* USART receive character interrupt */
 ISR(USART0_RX_vect) {
-    char RxByte;
-    RxByte = UDR0;
-    UDR0 = RxByte; // Echo back the received byte
+    *rxWritePtr = UDR0;
+    UDR0 = *rxWritePtr; // Echo back the received byte
+    rxWritePtr++;
 }
