@@ -17,9 +17,8 @@
 const int16_t cal_slop = -500; // Slope calibration factor for rangefinder
 const int16_t cal_offs = 0x1c3; // Offset calibration factor for rangefinder
 volatile uint8_t doread = 0; // Report ADC data when doread is set in interrupt
-volatile char rxBuffer[RXBUFFERSIZE]; // Received character buffer
+volatile char rxBuffer[RXBUFFERSIZE]; // Create received character buffer
 char * rxStartPtr = rxBuffer; // Always points to start of buffer
-volatile char * rxScanPtr = rxBuffer; // Walks through buffer for scanning
 volatile char * rxWritePtr = rxBuffer; // Walks through buffer for writing
 
 /* Definitions for led() */
@@ -28,7 +27,7 @@ volatile char * rxWritePtr = rxBuffer; // Walks through buffer for writing
 
 
 int main(void) {
-    memset(rxBuffer,0,RXBUFFERSIZE);
+    memset(rxBuffer,0,RXBUFFERSIZE); // Initialize the rx buffer
     int16_t adc_data = 0; // Allow for up to 64 averages
     sei(); // Enable interrupts
     fosc_cal(); // Set calibrated 1MHz system clock
@@ -77,13 +76,14 @@ int main(void) {
 void scanRx(void) {
     char rxToken[20];
     char outStr[40];
+    char * rxScanPtr = rxBuffer; // Walks through buffer for scanning
     uint8_t retval = 0;
     memset(rxToken,0,20);
     /* Scan the command buffer for first occurance of \r */
-    char * termPtr = strchr(rxBuffer,'\r'); // Finds command terminator
-    if (termPtr != NULL) {
+    char * rxTermPtr = strchr(rxBuffer,'\r'); // Finds command terminator
+    if (rxTermPtr != NULL) {
         int count = 0;
-        while (rxScanPtr != termPtr) {
+        while (rxScanPtr != rxTermPtr) {
             rxToken[count] = *rxScanPtr;
             rxScanPtr++;
             count++;
