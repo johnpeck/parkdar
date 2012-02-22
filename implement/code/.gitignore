@@ -1,6 +1,8 @@
 # Compiled source #
 ###################
 *.o
+*.eep
+*.map
 
 # Listing files #
 ###################

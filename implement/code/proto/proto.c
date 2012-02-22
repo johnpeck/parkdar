@@ -43,11 +43,12 @@ int getavg(int *array,int avgnum) {
 int idxtest() {
     char rxbuffer[20]; // This will be like my recieved character buffer
     memset(rxbuffer,0,20);
+    char rxToken[20];
+    memset(rxToken,0,20);
     char * rxStartPtr = rxbuffer; // Always points to start of buffer
     char * rxScanPtr = rxbuffer; // Walks through buffer
     char * rxWritePtr = rxbuffer; // Walks through buffer for writing
-    char mystring[20] = "string"; // This is like chars from USART
-    char rxToken[20];
+    char mystring[20] = "stringstring"; // This is like chars from USART
     int count = 0;
     /* Write mystring to the command buffer */
     while ( mystring[count] != '\0' ) {
@@ -56,8 +57,13 @@ int idxtest() {
         count++;
     };
     puts(rxbuffer);
-    /* Scan the command buffer for first occurance of \r */
+    /* Scan the command buffer for first occurance of \r.  If there is
+     * one, then everything leading up to it is part of the incoming
+     * command.  If there's no \r and the buffer is more than half full,
+     * there's no way a good command will be entered.  Print an error
+     * message and clear the buffer. */
     char * termPtr = strchr(rxbuffer,'\r'); // Finds command terminator
+    int rxCharnum = strlen(rxbuffer); // Find characters in receive buffer
     if (termPtr != NULL) {
         count = 0;
         while (rxScanPtr != termPtr) {
@@ -66,6 +72,11 @@ int idxtest() {
             count++;
         };
         printf("The found token is %s\r\n",rxToken);
+    }
+    else if (rxCharnum > (20 >> 2)) {
+        puts("Buffer overflow!");
+        rxWritePtr = rxbuffer;
+        memset(rxbuffer,0,20); // Reset the buffer
     };
  }
           

@@ -18,7 +18,6 @@ const int16_t cal_slop = -500; // Slope calibration factor for rangefinder
 const int16_t cal_offs = 0x1c3; // Offset calibration factor for rangefinder
 volatile uint8_t doread = 0; // Report ADC data when doread is set in interrupt
 volatile char rxBuffer[RXBUFFERSIZE]; // Create received character buffer
-char * rxStartPtr = rxBuffer; // Always points to start of buffer
 volatile char * rxWritePtr = rxBuffer; // Walks through buffer for writing
 
 /* Definitions for led() */
@@ -81,6 +80,7 @@ void scanRx(void) {
     memset(rxToken,0,20);
     /* Scan the command buffer for first occurance of \r */
     char * rxTermPtr = strchr(rxBuffer,'\r'); // Finds command terminator
+    uint8_t rxCharnum = strlen(rxBuffer); // Find characters in receive buffer
     if (rxTermPtr != NULL) {
         int count = 0;
         while (rxScanPtr != rxTermPtr) {
@@ -88,13 +88,18 @@ void scanRx(void) {
             rxScanPtr++;
             count++;
         };
+        usart_puts("\r\n"); // Leave whatever was typed on the terminal
         retval = sprintf(outStr,"The found token is %s\r\n",rxToken);
         usart_puts(outStr);
         memset(rxBuffer,0,RXBUFFERSIZE); // Re-initialize the receive buffer
-        rxScanPtr = rxStartPtr; // Move the scanning pointer back to the beginning
-        rxWritePtr = rxStartPtr; // Move writing back to the beginning
+        rxScanPtr = rxBuffer; // Move the scanning pointer back to the beginning
+        rxWritePtr = rxBuffer; // Move writing back to the beginning
+    }
+    else if ( rxCharnum > (RXBUFFERSIZE >> 1)) {
+        usart_puts("Buffer overflow!\r\n");
+        memset(rxBuffer,0,RXBUFFERSIZE); // Re-initialize the receive buffer
+        rxWritePtr = rxBuffer; // Move writing back to the beginning
     };
-
 }
 
 
