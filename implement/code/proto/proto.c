@@ -62,7 +62,7 @@ int idxtest() {
      * command.  If there's no \r and the buffer is more than half full,
      * there's no way a good command will be entered.  Print an error
      * message and clear the buffer. */
-    char * termPtr = strchr(rxbuffer,'\r'); // Finds command terminator
+    char * termPtr = strchr(rxbuffer,'\r'); // Finds first command terminator
     int rxCharnum = strlen(rxbuffer); // Find characters in receive buffer
     if (termPtr != NULL) {
         count = 0;
@@ -85,9 +85,28 @@ int idxtest() {
  * the entire command string returned by the command scanner.  Separates
  * the command and its argument.
  * --Commands and arguments are separated by spaces -- not generalized
- *   whitespace.  There may be more than one space after a command. */
-void cmdIdent(char * cmdString) {
-    printf("I received the command %s\r\n",cmdString);
+ *   whitespace.  There may be more than one space after a command. 
+ * --Commands are made of 5 characters + an optional question mark */
+void cmdIdent(char * recString) {
+    char cmdStr[10]; // Will hold the command (not the argument)
+    char * scanPtr = recString;
+    memset(cmdStr,0,10);
+    printf("I received the string %s\r\n",recString);
+    /* Check for spaces -- is there an argument? */
+    char * firstSpacePtr = strchr(recString,' '); // Finds first space 
+    if (firstSpacePtr != NULL) {
+        int count = 0;
+        while (scanPtr != firstSpacePtr) {
+            cmdStr[count] = *scanPtr;
+            scanPtr++;
+            count++;
+        };
+        printf("The command has a space and is %s\r\n",cmdStr);
+    }
+    else {
+        strcpy(cmdStr,recString);
+        printf("The command didn't have a space and is %s\r\n",cmdStr);
+    };
 }
 
 
@@ -110,7 +129,7 @@ int main()
         idxtest();
     };
     if (doIdent != 0) {
-        cmdIdent("Test");
+        cmdIdent("Test 5");
     };
     return 0;
 }
