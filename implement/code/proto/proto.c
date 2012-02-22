@@ -80,6 +80,15 @@ int idxtest() {
     };
  }
           
+/* cmdIdent(*cmdString)
+ * Checks to see if a command is recognized by the system.  Accepts
+ * the entire command string returned by the command scanner.  Separates
+ * the command and its argument.
+ * --Commands and arguments are separated by spaces -- not generalized
+ *   whitespace.  There may be more than one space after a command. */
+void cmdIdent(char * cmdString) {
+    printf("I received the command %s\r\n",cmdString);
+}
 
 
 
@@ -87,7 +96,8 @@ int idxtest() {
 int main()
 {
     int doAvgTest = 0; // Test averaging numbers in an array
-    int doIdxTest = 1; // Test indexing in an array
+    int doIdxTest = 0; // Test indexing in an array
+    int doIdent = 1; // Test identifying a string
     if (doAvgTest != 0) { 
         int myarray[20] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,\
                        20};
@@ -98,6 +108,9 @@ int main()
     }; // End average test
     if (doIdxTest != 0) {
         idxtest();
+    };
+    if (doIdent != 0) {
+        cmdIdent("Test");
     };
     return 0;
 }
