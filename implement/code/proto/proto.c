@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#define NUMCOMMANDS 5
+
+char * cmdListPtr[NUMCOMMANDS] = {
+    "range?",
+    "RANGE?"
+};
 
 
 int looper(int *array) {
@@ -107,6 +113,7 @@ void cmdIdent(char * recString) {
         strcpy(cmdStr,recString);
         printf("The command didn't have a space and is %s\r\n",cmdStr);
     };
+    printf("The first command in the list is %s\r\n",cmdListPtr[0]);
     /* Now see if the command is identified */
 }
 
