@@ -107,6 +107,7 @@ void cmdIdent(char * recString) {
         strcpy(cmdStr,recString);
         printf("The command didn't have a space and is %s\r\n",cmdStr);
     };
+    /* Now see if the command is identified */
 }
 
 
