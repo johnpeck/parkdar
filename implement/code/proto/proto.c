@@ -114,7 +114,21 @@ void cmdIdent(char * recString) {
         printf("The command didn't have a space and is %s\r\n",cmdStr);
     };
     printf("The first command in the list is %s\r\n",cmdListPtr[0]);
-    /* Now see if the command is identified */
+    /* Now see if the command is identified.  Loop through all remote
+     * commands and test. */
+    int strDiff = 0;
+    int cmdValid = 0;
+    for ( int i = 0; i < NUMCOMMANDS; i++ ) {
+        strDiff = strcmp( cmdStr, cmdListPtr[i] );
+        if ( strDiff == 0 ) {
+            printf("The command %s is recognized.\r\n",cmdStr);
+            cmdValid = 1;
+            break;
+        };
+    };
+    if ( cmdValid != 1 ) {
+        printf("The command %s is not recognized.\r\n",cmdStr);
+    };
 }
 
 
@@ -137,7 +151,7 @@ int main()
         idxtest();
     };
     if (doIdent != 0) {
-        cmdIdent("Test 5");
+        cmdIdent("range?");
     };
     return 0;
 }
