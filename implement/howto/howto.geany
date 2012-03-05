@@ -17,10 +17,11 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=2
-FILE_NAME_0=278;Make;0;16;1;1;0;/home/john/projects/parkdar/implement/howto/makefile;0;4
-FILE_NAME_1=1074;LaTeX;0;16;0;1;0;/home/john/projects/parkdar/implement/howto/howto.tex;0;4
+current_page=3
+FILE_NAME_0=301;Make;0;16;1;1;0;/home/john/projects/parkdar/implement/howto/makefile;0;4
+FILE_NAME_1=918;LaTeX;0;16;0;1;0;/home/john/projects/parkdar/implement/howto/howto.tex;0;4
 FILE_NAME_2=379;LaTeX;0;16;0;1;1;/home/john/projects/parkdar/implement/howto/setmodfreq.tex;0;4
+FILE_NAME_3=451;LaTeX;0;16;0;1;1;/home/john/projects/parkdar/implement/howto/rxcommand.tex;0;4
 
 [VTE]
 last_dir=/home/john/projects/resgen
