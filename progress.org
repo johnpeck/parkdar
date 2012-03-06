@@ -31,6 +31,9 @@
 ** uncal?
 *** Returns uncalibrated ADC counts from one of the latest measurements
 ** DONE Draw state diagram for incoming commands
+** TODO Implement cmdIdent for the Butterfly
+   - Takes a pointer to a command string.  Checks to see if the command part of the command string is recognized.  I guess the next step would be to see if the argument to the command is ok.  The function will either return a pointer to the good command string, or NULL if the command is not recognized.
+   - In prototype code, I need to make cmdIdent talk to a global command buffer
 * TODO Add section on command parsing to the howto
 * TODO Adjust one pencil channel's offset to 3.3V
 * TODO Stock pencils power supply rise time is too slow

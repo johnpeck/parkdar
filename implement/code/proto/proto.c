@@ -3,6 +3,9 @@
 
 #define NUMCOMMANDS 5
 
+char rxbuffer[20]; // This will be like my recieved character buffer
+
+
 char * cmdListPtr[NUMCOMMANDS] = {
     "range?",
     "RANGE?"
@@ -47,7 +50,7 @@ int getavg(int *array,int avgnum) {
 /* idxtest()
  * Builds up a character array until a \r is detected. */
 int idxtest() {
-    char rxbuffer[20]; // This will be like my recieved character buffer
+    
     memset(rxbuffer,0,20);
     char rxToken[20];
     memset(rxToken,0,20);
@@ -93,7 +96,7 @@ int idxtest() {
  * --Commands and arguments are separated by spaces -- not generalized
  *   whitespace.  There may be more than one space after a command. 
  * --Commands are made of 5 characters + an optional question mark */
-void cmdIdent(char * recString) {
+char * cmdIdent(char * recString) {
     char cmdStr[10]; // Will hold the command (not the argument)
     char * scanPtr = recString;
     memset(cmdStr,0,10);
@@ -129,6 +132,7 @@ void cmdIdent(char * recString) {
     if ( cmdValid != 1 ) {
         printf("The command %s is not recognized.\r\n",cmdStr);
     };
+    return cmdStr;
 }
 
 
@@ -151,7 +155,7 @@ int main()
         idxtest();
     };
     if (doIdent != 0) {
-        cmdIdent("range?");
+        cmdIdent("range? 5"); // Send the command I want to check
     };
     return 0;
 }
