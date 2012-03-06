@@ -1,12 +1,12 @@
-Figure \ref{fig:rxCmdFlow} shows how incoming commands are processed.
+Figure \ref{fig:rxCmdFlow} shows how incoming characters are processed into command strings.
 \begin{figure}[ht]
     \begin{center}
         \includegraphics[clip,scale=0.5]{rxCmdFlow}
-        \caption{Flow diagram for incoming ASCII commands.\label{fig:rxCmdFlow}}
+        \caption{Flow diagram for processing incoming ASCII characters into command strings.\label{fig:rxCmdFlow}}
     \end{center}
 \end{figure}
 
-
+The received character buffer, illustrated in figure \ref{fig:rxBuffer}, is filled by the USART and scanned periodically by the firmware.
 \begin{figure}[ht]
     \begin{center}
         \includegraphics[clip,scale=0.7]{rxBuffer}
@@ -14,3 +14,12 @@ Figure \ref{fig:rxCmdFlow} shows how incoming commands are processed.
     \end{center}
 \end{figure}
 
+If a \verb8\r8 character is found in the received character buffer, the characters up to that \verb8\r8 become known as a command string.  The command string is copied to the command string buffer, and a state variable is set to let the system know that the buffer is ready to be parsed.
+The command string buffer is then processed as shown in figure \ref{fig:cStrFlow} to see if it contains a recognized command.
+
+\begin{figure}[ht]
+    \begin{center}
+        \includegraphics[clip,scale=0.6]{cStrFlow}
+        \caption{Flow diagram for processing the command string buffer.\label{fig:cStrFlow}}
+    \end{center}
+\end{figure}
