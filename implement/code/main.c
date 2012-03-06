@@ -11,13 +11,16 @@
 
 /* Define the size of the receive character buffer */
 #define RXBUFFERSIZE 20
+/* Define the size of the command string buffer */
+#define CSTRBUFFERSIZE 20
 
 /* Global variables */
 /* Calibration slope is in mils per count */
 const int16_t cal_slop = -500; // Slope calibration factor for rangefinder
 const int16_t cal_offs = 0x1c3; // Offset calibration factor for rangefinder
 volatile uint8_t doread = 0; // Report ADC data when doread is set in interrupt
-volatile char rxBuffer[RXBUFFERSIZE]; // Create received character buffer
+volatile char rxBuffer[RXBUFFERSIZE]; // Received character buffer
+volatile char cmdStrBuffer[CSTRBUFFERSIZE]; // Command string buffer
 volatile char * rxWritePtr = rxBuffer; // Walks through buffer for writing
 
 /* Definitions for led() */
@@ -26,7 +29,8 @@ volatile char * rxWritePtr = rxBuffer; // Walks through buffer for writing
 
 
 int main(void) {
-    memset(rxBuffer,0,RXBUFFERSIZE); // Initialize the rx buffer
+    memset(rxBuffer,0,RXBUFFERSIZE); // Initialize buffers
+    memset(cmdStrBuffer,0,CSTRBUFFERSIZE); 
     int16_t adc_data = 0; // Allow for up to 64 averages
     sei(); // Enable interrupts
     fosc_cal(); // Set calibrated 1MHz system clock
@@ -89,7 +93,10 @@ void scanRx(void) {
             count++;
         };
         usart_puts("\r\n"); // Leave whatever was typed on the terminal
-        retval = sprintf(outStr,"The found token is %s\r\n",rxToken);
+        /* Copy the command string to the global command string buffer.
+         * We'll then erase the received character buffer. */
+        strcpy(cmdStrBuffer,rxToken);  
+        retval = sprintf(outStr,"The command string is %s\r\n",cmdStrBuffer);
         usart_puts(outStr);
         memset(rxBuffer,0,RXBUFFERSIZE); // Re-initialize the receive buffer
         rxScanPtr = rxBuffer; // Move the scanning pointer back to the beginning
