@@ -2,8 +2,20 @@
 #include <string.h>
 
 #define NUMCOMMANDS 5
+/* Define the size of the received character buffer */
+#define RECEIVE_BUFFER_SIZE 20
 
-char rxbuffer[20]; // This will be like my recieved character buffer
+/* This will be like my received character buffer */
+char usart_receive_buffer[RECEIVE_BUFFER_SIZE]; 
+
+
+void usart_init() {
+    memset(usart_receive_buffer,0,RECEIVE_BUFFER_SIZE);
+}
+
+void usart_receive_isr(char inputchar) {
+    
+}
 
 
 char * cmdListPtr[NUMCOMMANDS] = {
@@ -51,12 +63,12 @@ int getavg(int *array,int avgnum) {
  * Builds up a character array until a \r is detected. */
 int idxtest() {
     
-    memset(rxbuffer,0,20);
+    memset(usart_receive_buffer,0,20);
     char rxToken[20];
     memset(rxToken,0,20);
-    char * rxStartPtr = rxbuffer; // Always points to start of buffer
-    char * rxScanPtr = rxbuffer; // Walks through buffer
-    char * rxWritePtr = rxbuffer; // Walks through buffer for writing
+    char * rxStartPtr = usart_receive_buffer; // Always points to start of buffer
+    char * rxScanPtr = usart_receive_buffer; // Walks through buffer
+    char * rxWritePtr = usart_receive_buffer; // Walks through buffer for writing
     char mystring[20] = "stringstring"; // This is like chars from USART
     int count = 0;
     /* Write mystring to the command buffer */
@@ -65,14 +77,14 @@ int idxtest() {
         rxWritePtr++;
         count++;
     };
-    puts(rxbuffer);
+    puts(usart_receive_buffer);
     /* Scan the command buffer for first occurance of \r.  If there is
      * one, then everything leading up to it is part of the incoming
      * command.  If there's no \r and the buffer is more than half full,
      * there's no way a good command will be entered.  Print an error
      * message and clear the buffer. */
-    char * termPtr = strchr(rxbuffer,'\r'); // Finds first command terminator
-    int rxCharnum = strlen(rxbuffer); // Find characters in receive buffer
+    char * termPtr = strchr(usart_receive_buffer,'\r'); // Finds first command terminator
+    int rxCharnum = strlen(usart_receive_buffer); // Find characters in receive buffer
     if (termPtr != NULL) {
         count = 0;
         while (rxScanPtr != termPtr) {
@@ -84,8 +96,8 @@ int idxtest() {
     }
     else if (rxCharnum > (20 >> 2)) {
         puts("Buffer overflow!");
-        rxWritePtr = rxbuffer;
-        memset(rxbuffer,0,20); // Reset the buffer
+        rxWritePtr = usart_receive_buffer;
+        memset(usart_receive_buffer,0,20); // Reset the buffer
     };
  }
           
@@ -135,6 +147,9 @@ char * cmdIdent(char * recString) {
     return cmdStr;
 }
 
+/* receive_isr_proto(char)
+ * This mocks up the receive character interrupt of the AVR */
+ 
 
 
 
@@ -142,7 +157,8 @@ int main()
 {
     int doAvgTest = 0; // Test averaging numbers in an array
     int doIdxTest = 0; // Test indexing in an array
-    int doIdent = 1; // Test identifying a string
+    int doIdent = 0; // Test identifying a string
+    int do_isr_test = 1; // Test the isr prototype
     if (doAvgTest != 0) { 
         int myarray[20] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,\
                        20};
@@ -157,5 +173,8 @@ int main()
     if (doIdent != 0) {
         cmdIdent("range? 5"); // Send the command I want to check
     };
+    if (do_isr_test != 0) {
+        usart_init();
+    }
     return 0;
 }
