@@ -8,8 +8,15 @@
 /* This will be like my received character buffer */
 char usart_receive_buffer[RECEIVE_BUFFER_SIZE]; 
 
+typedef struct { char rbuffer[RECEIVE_BUFFER_SIZE];
+                 int charcount; // Number of chars sent to receive buffer
+               } rbuffer_state_t;
+rbuffer_state_t  *rbuffer_state_ptr; // Define a pointer to the state
+    
 
-void usart_init() {
+/* Making this function explicitly take a pointer to the receive buffer
+ * state structure makes it clear that it modifies this structure */
+void usart_init( rbuffer_state_t *rbuffer_state_ptr ) {
     memset(usart_receive_buffer,0,RECEIVE_BUFFER_SIZE);
 }
 
@@ -174,7 +181,7 @@ int main()
         cmdIdent("range? 5"); // Send the command I want to check
     };
     if (do_isr_test != 0) {
-        usart_init();
+        usart_init( rbuffer_state_ptr );
     }
     return 0;
 }
