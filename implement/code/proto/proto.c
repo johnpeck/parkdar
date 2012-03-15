@@ -8,28 +8,33 @@
 /* This will be like my received character buffer */
 char usart_receive_buffer[RECEIVE_BUFFER_SIZE]; 
 
-typedef struct { char rbuffer[RECEIVE_BUFFER_SIZE];
-                 int charcount; // Number of chars sent to receive buffer
-               } rbuffer_state_t;
-rbuffer_state_t  *rbuffer_state_ptr; // Define a pointer to the state
-    
+/* Receive character buffer state structure. The idea is that I'll create
+ * a structure to keep track of the state in every flow diagram I make.
+ * I have a flow diagram for received characters, so I created this
+ * structure. */
+typedef struct { 
+    char rbuffer[RECEIVE_BUFFER_SIZE]; // Received character buffer
+    int charcount; // Number of chars sent to receive buffer
+    int pbuffer_lock; // Parse buffer lock.  1 = locked
+} rbuffer_state_t;
+// Define a pointer to the state
+rbuffer_state_t  rbuffer_state, *rbuffer_state_ptr = &rbuffer_state;
+
 
 /* Making this function explicitly take a pointer to the receive buffer
- * state structure makes it clear that it modifies this structure */
+ * state structure makes it clear that it modifies this structure.  This
+ * function will ultimately also have to set up the USART hardware. */
 void usart_init( rbuffer_state_t *rbuffer_state_ptr ) {
-    memset(usart_receive_buffer,0,RECEIVE_BUFFER_SIZE);
+    memset((rbuffer_state_ptr -> rbuffer),0,RECEIVE_BUFFER_SIZE);
+    rbuffer_state_ptr -> charcount = 0;
+    rbuffer_state_ptr -> pbuffer_lock = 0; // Parse buffer unlocked
+    return;
 }
-
-void usart_receive_isr(char inputchar) {
-    
-}
-
 
 char * cmdListPtr[NUMCOMMANDS] = {
     "range?",
     "RANGE?"
 };
-
 
 int looper(int *array) {
     for (int count = 0;count < 5; count++) {
@@ -156,9 +161,15 @@ char * cmdIdent(char * recString) {
 
 /* receive_isr_proto(char)
  * This mocks up the receive character interrupt of the AVR */
+void receive_isr_proto( rbuffer_state_t *rbuffer_state_ptr,
+                         char *inchar) {
+    if (!strcmp(inchar,"\r")) {
+        printf("It's a terminator");
+    };
+    return;
+}
+
  
-
-
 
 int main()
 {
@@ -170,7 +181,7 @@ int main()
         int myarray[20] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,\
                        20};
         puts("Hello World!");
-        looper(myarray);
+        //looper(myarray);
         printf("Average value is %d\n",getavg(myarray,2));
         printf("Five over 2 is %0.3f\n",(0.5*5));
     }; // End average test
@@ -182,6 +193,7 @@ int main()
     };
     if (do_isr_test != 0) {
         usart_init( rbuffer_state_ptr );
-    }
+        //receive_isr_proto(rbuffer_state_ptr, "r");
+    };
     return 0;
 }

@@ -25,7 +25,7 @@
 * DONE Connect mta100 header to J402
   - This is for ADC4 as shown in the [[file:implement/drawings/butterfly_connect.fig][drawing]].
 * DONE Modify code to select ADC4 as analog input.
-* TODO Add command parser for two commands [1/1]
+* TODO Add command parser for two commands [2/3]
 ** range?
 *** Returns calibrated range in inches from one of the latest measurements
 ** uncal?
@@ -33,7 +33,7 @@
 ** DONE Draw state diagram for incoming commands
 ** TODO Prototype recieve command flow
    - Call a function with a character representing that coming in over the USART.  This function will prototype the ISR we'll write for the AVR.  Call this receive_isr_proto(). 
-** TODO Make a global structure to keep track of the received character state
+** DONE Make a global structure to keep track of the received character state
    - Character count
 * TODO Add section on command parsing to the howto
 * TODO Adjust one pencil channel's offset to 3.3V
