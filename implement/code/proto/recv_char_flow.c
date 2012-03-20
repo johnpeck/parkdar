@@ -7,10 +7,6 @@
 // Define the size of the parse buffer
 #define PARSE_BUFFER_SIZE 20
 
-
-/* This will be like my received character buffer */
-char usart_receive_buffer[RECEIVE_BUFFER_SIZE]; 
-
 /* Received command state structure. The idea is that I'll create
  * a structure to keep track of the state in every flow diagram I make.
  * I have a flow diagram for received characters, so I created this
@@ -40,6 +36,15 @@ void usart_init( recv_cmd_state_t *recv_cmd_state_ptr ) {
     return;
 }
 
+/* Erases the received character buffer, resets the received character
+ * number, and resets the write pointer. */
+void rbuffer_erase( recv_cmd_state_t *recv_cmd_state_ptr ) {
+    memset((recv_cmd_state_ptr -> rbuffer),0,RECEIVE_BUFFER_SIZE);
+    recv_cmd_state_ptr -> rbuffer_write_ptr =
+        recv_cmd_state_ptr -> rbuffer; // Initialize write pointer
+    recv_cmd_state_ptr -> rbuffer_count = 0;
+    return;
+}
 
 /* receive_isr_proto(char)
  * This mocks up the receive character interrupt of the AVR */
@@ -47,10 +52,42 @@ void receive_isr_proto( recv_cmd_state_t *recv_cmd_state_ptr,
                          char *inchar) {
     if (!strcmp(inchar,"\r")) {
         printf("Found a terminator\r\n");
+        if ((recv_cmd_state_ptr -> rbuffer_count) == 0) {
+            return;
+        }
+        else {
+            if ((recv_cmd_state_ptr -> pbuffer_lock) == 1) {
+                printf("Command process speed error!\r\n");
+                rbuffer_erase(recv_cmd_state_ptr);
+                return;
+            }
+            else {
+                strcpy((recv_cmd_state_ptr -> pbuffer),
+                    (recv_cmd_state_ptr -> rbuffer));
+                recv_cmd_state_ptr -> pbuffer_lock = 1;
+                printf("Parse buffer contains %s\r\n",
+                    (recv_cmd_state_ptr -> pbuffer));
+                return;
+            }
+        }
     }
     else {
-        printf("  <-- Not a terminator\r\n");
-        (recv_cmd_state_ptr -> rbuffer_count)++;
+        printf("  <-- Not a terminator.  Received count is %d\r\n",
+            recv_cmd_state_ptr -> rbuffer_count);
+        if ((recv_cmd_state_ptr -> rbuffer_count) >=
+            (RECEIVE_BUFFER_SIZE-1)) {
+            printf("Received character number above limit.\r\n");
+            rbuffer_erase(recv_cmd_state_ptr);
+            return;
+        }
+        else {
+            // Write the character to the received character buffer
+            strcpy((recv_cmd_state_ptr -> rbuffer_write_ptr),inchar);
+            // Increment the received character count
+            (recv_cmd_state_ptr -> rbuffer_count)++;
+            // Increment the write pointer
+            (recv_cmd_state_ptr -> rbuffer_write_ptr)++;
+        }
     }
     return;
 }
@@ -60,7 +97,7 @@ void receive_isr_proto( recv_cmd_state_t *recv_cmd_state_ptr,
 int main()
 {
     usart_init( recv_cmd_state_ptr );
-    char teststr[] = "test"; 
+    char teststr[] = "12345\r"; 
     char *teststr_ptr = teststr;
     char individ_char[2] = "0"; // Individual character pulled from string
     for ( int index = 0; index < strlen(teststr); index++) {
