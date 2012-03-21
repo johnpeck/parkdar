@@ -36,6 +36,7 @@
 ** TODO Port receive_isr_proto to the butterfly
 ** DONE Make a global structure to keep track of the received character state
    - Character count
+** TODO Make a flow diagram for command parsing
 * TODO Add section on command parsing to the howto
 * TODO Adjust one pencil channel's offset to 3.3V
 * TODO Stock pencils power supply rise time is too slow
