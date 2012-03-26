@@ -1,11 +1,18 @@
 #include <stdio.h>
 #include <string.h>
 
+
 #define NUMCOMMANDS 5
 // Define the size of the received character buffer
 #define RECEIVE_BUFFER_SIZE 20
 // Define the size of the parse buffer
 #define PARSE_BUFFER_SIZE 20
+
+/* Define fpointer_t to have the type "pointer to function," a return
+ * value of void, and a parameter type of void. */
+typedef void (*fpointer_t)(void);
+
+
 
 /* Received command state structure. The idea is that I'll create
  * a structure to keep track of the state in every flow diagram I make.

@@ -37,6 +37,8 @@
 ** DONE Make a global structure to keep track of the received character state
    - Character count
 ** TODO Make a flow diagram for command parsing
+** TODO Mock up using a command table with function pointers as described in Making Embedded Systems
+   DEADLINE: <2012-03-25 Sun>
 * TODO Add section on command parsing to the howto
 * TODO Adjust one pencil channel's offset to 3.3V
 * TODO Stock pencils power supply rise time is too slow
