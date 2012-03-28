@@ -31,7 +31,7 @@
 ** uncal?
 *** Returns uncalibrated ADC counts from one of the latest measurements
 ** DONE Draw state diagram for incoming commands
-** DONE Prototype recieve command flow
+** DONE Prototype receive command flow
    - Call a function with a character representing that coming in over the USART.  This function will prototype the ISR we'll write for the AVR.  Call this receive_isr_proto(). 
 ** TODO Port receive_isr_proto to the butterfly
 ** DONE Make a global structure to keep track of the received character state

@@ -47,6 +47,7 @@ typedef struct {
     char pbuffer[PARSE_BUFFER_SIZE]; // Parse buffer
     int rbuffer_count; // Number of chars sent to receive buffer
     int pbuffer_lock; // Parse buffer lock.  1 = locked
+    int pbuffer_match; // Match found for command in pbuffer.  1 = match
 } recv_cmd_state_t;
 // Define a pointer to the state
 recv_cmd_state_t  recv_cmd_state, *recv_cmd_state_ptr = &recv_cmd_state;
@@ -141,7 +142,20 @@ void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
         while ((command_array -> execute) != 0) {
             printf("Looking at command %s\r\n",
                 command_array -> name);
+            if (strcmp( recv_cmd_state_ptr -> pbuffer,
+                command_array -> name ) == 0) {
+                printf("Match found \r\n");
+                command_array -> execute();
+                recv_cmd_state_ptr -> pbuffer_match = 1;
+                break;
+            }
             command_array++;
+        }
+        // If we didn't find a match, send an error message
+        if (recv_cmd_state_ptr -> pbuffer_match == 0) {
+            printf("Unrecognized command: %s\r\n",
+                   recv_cmd_state_ptr -> pbuffer); 
+            recv_cmd_state_ptr -> pbuffer_lock = 0;
         }
     }
     else {
@@ -155,7 +169,7 @@ void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
 int main()
 {
     usart_init( recv_cmd_state_ptr );
-    char teststr[] = "12345\r"; 
+    char teststr[] = "junky\r"; 
     char *teststr_ptr = teststr;
     char individ_char[2] = "0"; // Individual character pulled from string
     for ( int index = 0; index < strlen(teststr); index++) {
