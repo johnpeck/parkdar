@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "recv_char_flow.h"
 
 
 #define NUMCOMMANDS 5
@@ -11,6 +12,27 @@
 /* Define fpointer_t to have the type "pointer to function," a return
  * value of void, and a parameter type of void. */
 typedef void (*fpointer_t)(void);
+/* Each command_struct will describe one command */
+struct command_struct {
+    char *name; // The name of the command
+    fpointer_t execute; // The function to execute
+    char *help;
+};
+
+/* An array of command_structs will contain our remote commands */
+struct command_struct command_array[] ={
+    // The junk function
+    {"junk",
+    &junkfunc,
+    "Some junk"},
+    // The crap function
+    {"crap",
+    &crapfunc,
+    "Some crap"},
+    // End of table indicator.  Must be last.
+    {"",0,""}
+};
+
 
 
 
@@ -28,6 +50,16 @@ typedef struct {
 } recv_cmd_state_t;
 // Define a pointer to the state
 recv_cmd_state_t  recv_cmd_state, *recv_cmd_state_ptr = &recv_cmd_state;
+
+void junkfunc(void) {
+    printf("This is all junk!\r\n");
+    return;
+}
+
+void crapfunc(void) {
+    printf("This is all crap!\r\n");
+    return;
+}
 
 
 /* Making this function explicitly take a pointer to the received command
@@ -99,6 +131,25 @@ void receive_isr_proto( recv_cmd_state_t *recv_cmd_state_ptr,
     return;
 }
 
+/* process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr,
+ *                  command_struct *commands )
+ * Process the command (if there is one) in the parse buffer. */
+void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
+                    struct command_struct *command_array) {
+    if ((recv_cmd_state_ptr -> pbuffer_lock) == 1) {
+        printf("Parse buffer is locked\r\n");
+        while ((command_array -> execute) != 0) {
+            printf("Looking at command %s\r\n",
+                command_array -> name);
+            command_array++;
+        }
+    }
+    else {
+        printf("Parse buffer is unlocked\r\n");
+    }
+    return;
+}
+
  
 
 int main()
@@ -113,6 +164,7 @@ int main()
         receive_isr_proto(recv_cmd_state_ptr,individ_char);
         teststr_ptr++;
     };
+    process_pbuffer( recv_cmd_state_ptr, command_array );
     printf("\r\n");
     return 0;
 }
