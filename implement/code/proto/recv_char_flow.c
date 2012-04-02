@@ -137,6 +137,16 @@ void receive_isr_proto( recv_cmd_state_t *recv_cmd_state_ptr,
  * Process the command (if there is one) in the parse buffer. */
 void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
                     struct command_struct *command_array) {
+    char *param_ptr = strchr(recv_cmd_state_ptr -> pbuffer,' ');
+    if (param_ptr != NULL) {
+        printf("The command contains a space\r\n");
+        *param_ptr = '\0'; // Terminate the command string
+        param_ptr++;
+        while (*param_ptr == ' ') {
+            param_ptr++; // Move to first non-space character
+        }
+        printf("The parameter is %s\r\n",param_ptr);
+    }
     if ((recv_cmd_state_ptr -> pbuffer_lock) == 1) {
         printf("Parse buffer is locked\r\n");
         while ((command_array -> execute) != 0) {
@@ -166,10 +176,9 @@ void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
 
  
 
-int main()
-{
+int main() {
     usart_init( recv_cmd_state_ptr );
-    char teststr[] = "junky\r"; 
+    char teststr[] = "junky   134\r"; 
     char *teststr_ptr = teststr;
     char individ_char[2] = "0"; // Individual character pulled from string
     for ( int index = 0; index < strlen(teststr); index++) {
