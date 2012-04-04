@@ -16,8 +16,7 @@ typedef void (*fpointer_t)(void);
 struct command_struct {
     char *name; // The name of the command
     char *arg_type; // A string representing the type of argument expected
-    int arg_min;
-    int arg_max;
+    int arg_max_chars; // The maximum number of characters in the argument
     fpointer_t execute; // The function to execute
     char *help;
 };
@@ -27,17 +26,17 @@ struct command_struct command_array[] ={
     // The junk function
     {"junk", // Name
     "hex", // Argument type
-    0,0, // Min, max
+    2, // Maximum number of characters in argument
     &junkfunc,
     "Some junk"},
     // The crap function
     {"crap",
     "none",
-    0,0,
+    0,
     &crapfunc,
     "Some crap"},
     // End of table indicator.  Must be last.
-    {"","",0,0,0,""}
+    {"","",0,0,""}
 };
 
 
@@ -51,7 +50,11 @@ typedef struct {
     char rbuffer[RECEIVE_BUFFER_SIZE]; // Received character buffer
     // rbuffer_write_ptr will always point to the next write location
     char *rbuffer_write_ptr;
-    char pbuffer[PARSE_BUFFER_SIZE]; // Parse buffer
+    // Parse buffer.  pbuffer will point to the beginning of the parse
+    // buffer, which will also be the beginning of the command to be
+    // processed.
+    char pbuffer[PARSE_BUFFER_SIZE];
+    char *pbuffer_arg_ptr; // Points to the beginning of the argument
     int rbuffer_count; // Number of chars sent to receive buffer
     int pbuffer_lock; // Parse buffer lock.  1 = locked
 } recv_cmd_state_t;
@@ -77,20 +80,28 @@ void usart_init( recv_cmd_state_t *recv_cmd_state_ptr ) {
     recv_cmd_state_ptr -> rbuffer_write_ptr =
         recv_cmd_state_ptr -> rbuffer; // Initialize write pointer
     memset((recv_cmd_state_ptr -> pbuffer),0,PARSE_BUFFER_SIZE);
+    recv_cmd_state_ptr -> pbuffer_arg_ptr =
+        recv_cmd_state_ptr -> pbuffer; // Initialize argument pointer
     recv_cmd_state_ptr -> rbuffer_count = 0;
     recv_cmd_state_ptr -> pbuffer_lock = 0; // Parse buffer unlocked
     return;
 }
 
-int check_argrange(recv_cmd_state_t *recv_cmd_state_ptr ,
+/* check_argsize( pointer to received command state,
+ *                pointer to list of commands )
+ * Returns 0 if the argument size is less than or equal to the number
+ * of characters specified in the command list.  Returns -1 otherwise. */
+int check_argsize(recv_cmd_state_t *recv_cmd_state_ptr ,
                     struct command_struct *command_array) {
     int isok = 0;
     printf("Checking argument of %s...\r\n", command_array -> name);
-    if (strcmp( command_array -> arg_type, "hex" ) == 0) {
-        printf("Argument is in hex\r\n");
-        // Convert hex string to a number
+    int argsize = strlen(recv_cmd_state_ptr -> pbuffer_arg_ptr);
+    printf("Argument size is %d\r\n", argsize);
+    if (argsize > (command_array -> arg_max_chars)) {
+        printf("Argument is bigger than the specified %d!\r\n",
+               command_array -> arg_max_chars);
+        isok = -1;
     }
-        
     return isok;
 }
 
@@ -159,17 +170,17 @@ void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
     if ((recv_cmd_state_ptr -> pbuffer_lock) == 1) {
         // Parse buffer is locked -- there's a command to process
         printf("Parse buffer is locked\r\n");
-        char *arg_ptr = strchr(recv_cmd_state_ptr -> pbuffer,' ');
-        if (arg_ptr != NULL) {
+        recv_cmd_state_ptr -> pbuffer_arg_ptr = strchr(recv_cmd_state_ptr -> pbuffer,' ');
+        if (recv_cmd_state_ptr -> pbuffer_arg_ptr != NULL) {
             // Parse buffer contains a space -- there's an argument
             printf("The command contains a space\r\n");
-            *arg_ptr = '\0'; // Terminate the command string
-            arg_ptr++;
-            while (*arg_ptr == ' ') {
-                arg_ptr++; // Move to first non-space character
+            *(recv_cmd_state_ptr -> pbuffer_arg_ptr) = '\0'; // Terminate the command string
+            (recv_cmd_state_ptr -> pbuffer_arg_ptr)++;
+            while (*(recv_cmd_state_ptr -> pbuffer_arg_ptr) == ' ') {
+                (recv_cmd_state_ptr -> pbuffer_arg_ptr)++; // Move to first non-space character
             }
             // arg_ptr now points to the beginning of the parameter
-            printf("The parameter is %s\r\n",arg_ptr);
+            printf("The parameter is %s\r\n",(recv_cmd_state_ptr -> pbuffer_arg_ptr));
         }
         // Look through the command list for a match
         int pbuffer_match = 0;
@@ -183,19 +194,25 @@ void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
                 pbuffer_match = 1;
                 if (strcmp( command_array -> arg_type, "none") != 0) {
                     // The command is specified to have an argument
-                    int arg_ok = check_argrange(recv_cmd_state_ptr,command_array);
-                    break;
+                    int arg_ok = check_argsize(recv_cmd_state_ptr,command_array);
+                    if (arg_ok != 0) {
+                        printf("ERROR: Argument to %s is out of range.\r\n",
+                               command_array -> name);
+                        }
+                    else {
+                        command_array -> execute();
+                    }
                 }
                 else  {
-                    // There's no argument specified, just execute the command
-                    if (arg_ptr != NULL) {
+                    // There's no argument specified
+                    if (recv_cmd_state_ptr -> pbuffer_arg_ptr != NULL) {
                         // There's an argument, but we didn't expect one
                         printf("WARNING: Ignoring argument\r\n");
                     }
                     command_array -> execute();
-                    recv_cmd_state_ptr -> pbuffer_lock = 0;
-                    break;
                 }
+                recv_cmd_state_ptr -> pbuffer_lock = 0;
+                break;
             }
             command_array++;
         }
@@ -206,9 +223,6 @@ void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
             recv_cmd_state_ptr -> pbuffer_lock = 0;
         }
     }
-    else {
-        printf("Parse buffer is unlocked\r\n");
-    }
     return;
 }
 
@@ -218,7 +232,7 @@ void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
 
 int main() {
     usart_init( recv_cmd_state_ptr );
-    char teststr[] = "junk  134\r"; 
+    char teststr[] = "junk  13\r"; 
     char *teststr_ptr = teststr;
     char individ_char[2] = "0"; // Individual character pulled from string
     for ( int index = 0; index < strlen(teststr); index++) {
