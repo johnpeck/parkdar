@@ -15,6 +15,9 @@ typedef void (*fpointer_t)(void);
 /* Each command_struct will describe one command */
 struct command_struct {
     char *name; // The name of the command
+    char *arg_type; // A string representing the type of argument expected
+    int arg_min;
+    int arg_max;
     fpointer_t execute; // The function to execute
     char *help;
 };
@@ -22,15 +25,19 @@ struct command_struct {
 /* An array of command_structs will contain our remote commands */
 struct command_struct command_array[] ={
     // The junk function
-    {"junk",
+    {"junk", // Name
+    "hex", // Argument type
+    0,0, // Min, max
     &junkfunc,
     "Some junk"},
     // The crap function
     {"crap",
+    "none",
+    0,0,
     &crapfunc,
     "Some crap"},
     // End of table indicator.  Must be last.
-    {"",0,""}
+    {"","",0,0,0,""}
 };
 
 
@@ -47,7 +54,6 @@ typedef struct {
     char pbuffer[PARSE_BUFFER_SIZE]; // Parse buffer
     int rbuffer_count; // Number of chars sent to receive buffer
     int pbuffer_lock; // Parse buffer lock.  1 = locked
-    int pbuffer_match; // Match found for command in pbuffer.  1 = match
 } recv_cmd_state_t;
 // Define a pointer to the state
 recv_cmd_state_t  recv_cmd_state, *recv_cmd_state_ptr = &recv_cmd_state;
@@ -74,6 +80,18 @@ void usart_init( recv_cmd_state_t *recv_cmd_state_ptr ) {
     recv_cmd_state_ptr -> rbuffer_count = 0;
     recv_cmd_state_ptr -> pbuffer_lock = 0; // Parse buffer unlocked
     return;
+}
+
+int check_argrange(recv_cmd_state_t *recv_cmd_state_ptr ,
+                    struct command_struct *command_array) {
+    int isok = 0;
+    printf("Checking argument of %s...\r\n", command_array -> name);
+    if (strcmp( command_array -> arg_type, "hex" ) == 0) {
+        printf("Argument is in hex\r\n");
+        // Convert hex string to a number
+    }
+        
+    return isok;
 }
 
 /* Erases the received character buffer, resets the received character
@@ -137,32 +155,52 @@ void receive_isr_proto( recv_cmd_state_t *recv_cmd_state_ptr,
  * Process the command (if there is one) in the parse buffer. */
 void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
                     struct command_struct *command_array) {
-    char *param_ptr = strchr(recv_cmd_state_ptr -> pbuffer,' ');
-    if (param_ptr != NULL) {
-        printf("The command contains a space\r\n");
-        *param_ptr = '\0'; // Terminate the command string
-        param_ptr++;
-        while (*param_ptr == ' ') {
-            param_ptr++; // Move to first non-space character
-        }
-        printf("The parameter is %s\r\n",param_ptr);
-    }
+    
     if ((recv_cmd_state_ptr -> pbuffer_lock) == 1) {
+        // Parse buffer is locked -- there's a command to process
         printf("Parse buffer is locked\r\n");
+        char *arg_ptr = strchr(recv_cmd_state_ptr -> pbuffer,' ');
+        if (arg_ptr != NULL) {
+            // Parse buffer contains a space -- there's an argument
+            printf("The command contains a space\r\n");
+            *arg_ptr = '\0'; // Terminate the command string
+            arg_ptr++;
+            while (*arg_ptr == ' ') {
+                arg_ptr++; // Move to first non-space character
+            }
+            // arg_ptr now points to the beginning of the parameter
+            printf("The parameter is %s\r\n",arg_ptr);
+        }
+        // Look through the command list for a match
+        int pbuffer_match = 0;
         while ((command_array -> execute) != 0) {
             printf("Looking at command %s\r\n",
                 command_array -> name);
             if (strcmp( recv_cmd_state_ptr -> pbuffer,
                 command_array -> name ) == 0) {
+                // We've found a matching command
                 printf("Match found \r\n");
-                command_array -> execute();
-                recv_cmd_state_ptr -> pbuffer_match = 1;
-                break;
+                pbuffer_match = 1;
+                if (strcmp( command_array -> arg_type, "none") != 0) {
+                    // The command is specified to have an argument
+                    int arg_ok = check_argrange(recv_cmd_state_ptr,command_array);
+                    break;
+                }
+                else  {
+                    // There's no argument specified, just execute the command
+                    if (arg_ptr != NULL) {
+                        // There's an argument, but we didn't expect one
+                        printf("WARNING: Ignoring argument\r\n");
+                    }
+                    command_array -> execute();
+                    recv_cmd_state_ptr -> pbuffer_lock = 0;
+                    break;
+                }
             }
             command_array++;
         }
         // If we didn't find a match, send an error message
-        if (recv_cmd_state_ptr -> pbuffer_match == 0) {
+        if (pbuffer_match == 0) {
             printf("Unrecognized command: %s\r\n",
                    recv_cmd_state_ptr -> pbuffer); 
             recv_cmd_state_ptr -> pbuffer_lock = 0;
@@ -174,11 +212,13 @@ void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
     return;
 }
 
+
+
  
 
 int main() {
     usart_init( recv_cmd_state_ptr );
-    char teststr[] = "junky   134\r"; 
+    char teststr[] = "junk  134\r"; 
     char *teststr_ptr = teststr;
     char individ_char[2] = "0"; // Individual character pulled from string
     for ( int index = 0; index < strlen(teststr); index++) {

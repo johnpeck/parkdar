@@ -38,6 +38,7 @@
    - Character count
 ** TODO Make a flow diagram for command parsing
 ** TODO Mock up Ray's abstraction strategy for received command state.
+** TODO Figure out how to convert hex string to integer
 * TODO Add section on command parsing to the howto
 * TODO Adjust one pencil channel's offset to 3.3V
 * TODO Stock pencils power supply rise time is too slow
