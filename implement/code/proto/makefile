@@ -1,2 +1,3 @@
-all:
-	gcc -std=gnu99 recv_char_flow.c -o proto
+all: main.c command.c
+	gcc -std=gnu99 main.c command.c -o proto
+
