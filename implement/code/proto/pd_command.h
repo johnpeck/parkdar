@@ -1,3 +1,9 @@
+/* pd_command.h
+ * 
+ * Used to set up the parkdar command interface. */
+ #include "pd_ranger.h"
+
+
 // Define the size of the received character buffer
 #define RECEIVE_BUFFER_SIZE 20
 // Define the size of the parse buffer
@@ -34,9 +40,21 @@ struct command_struct {
 };
 
 
+
+
+
+
+
 /* check_argsize( pointer to received command state,
  *                pointer to list of commands )
  * Returns 0 if the argument size is less than or equal to the number
  * of characters specified in the command list.  Returns -1 otherwise. */
 int check_argsize(recv_cmd_state_t *recv_cmd_state_ptr ,
                   struct command_struct *command_array);
+
+
+/* process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr,
+ *                  command_struct *commands )
+ * Process the command (if there is one) in the parse buffer. */
+void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
+                    struct command_struct *command_array);

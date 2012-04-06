@@ -25,7 +25,7 @@
 * DONE Connect mta100 header to J402
   - This is for ADC4 as shown in the [[file:implement/drawings/butterfly_connect.fig][drawing]].
 * DONE Modify code to select ADC4 as analog input.
-* TODO Add command parser for two commands [4/7]
+* TODO Add command parser for two commands [5/8]
 ** range?
 *** Returns calibrated range in inches from one of the latest measurements
 ** uncal?
@@ -37,8 +37,7 @@
 ** DONE Make a global structure to keep track of the received character state
    - Character count
 ** DONE Make a flow diagram for command parsing
-** TODO Add command size checking via strlen
-** TODO Mock up Ray's abstraction strategy for received command state.
+** TODO Make gcc operate on object files in the makefile
 ** TODO Figure out how to convert hex string to integer
 * TODO Add section on command parsing to the howto
 * TODO Adjust one pencil channel's offset to 3.3V
