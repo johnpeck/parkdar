@@ -4,58 +4,10 @@
 #include "pd_command.h"
 
 
-
-
 // Define a pointer to the received command state
 recv_cmd_state_t  recv_cmd_state;
 recv_cmd_state_t *recv_cmd_state_ptr = &recv_cmd_state;
 
-/* An array of command_structs will contain our remote commands */
-struct command_struct command_array[] ={
-    // The junk function
-    {"junk", // Name
-    "hex", // Argument type
-    2, // Maximum number of characters in argument
-    &junkfunc,
-    "Some junk"},
-    // The crap function
-    {"crap",
-    "none",
-    0,
-    &crapfunc,
-    "Some crap"},
-    // End of table indicator.  Must be last.
-    {"","",0,0,""}
-};
-
-
-/* Making this function explicitly take a pointer to the received command
- * state structure makes it clear that it modifies this structure.  This
- * function will ultimately also have to set up the USART hardware. */
-void usart_init( recv_cmd_state_t *recv_cmd_state_ptr ) {
-    memset((recv_cmd_state_ptr -> rbuffer),0,RECEIVE_BUFFER_SIZE);
-    recv_cmd_state_ptr -> rbuffer_write_ptr =
-        recv_cmd_state_ptr -> rbuffer; // Initialize write pointer
-    memset((recv_cmd_state_ptr -> pbuffer),0,PARSE_BUFFER_SIZE);
-    recv_cmd_state_ptr -> pbuffer_arg_ptr =
-        recv_cmd_state_ptr -> pbuffer; // Initialize argument pointer
-    recv_cmd_state_ptr -> rbuffer_count = 0;
-    recv_cmd_state_ptr -> pbuffer_lock = 0; // Parse buffer unlocked
-    return;
-}
-
-
-
-
-/* Erases the received character buffer, resets the received character
- * number, and resets the write pointer. */
-void rbuffer_erase( recv_cmd_state_t *recv_cmd_state_ptr ) {
-    memset((recv_cmd_state_ptr -> rbuffer),0,RECEIVE_BUFFER_SIZE);
-    recv_cmd_state_ptr -> rbuffer_write_ptr =
-        recv_cmd_state_ptr -> rbuffer; // Initialize write pointer
-    recv_cmd_state_ptr -> rbuffer_count = 0;
-    return;
-}
 
 /* receive_isr_proto(char)
  * This mocks up the receive character interrupt of the AVR */
@@ -104,13 +56,8 @@ void receive_isr_proto( recv_cmd_state_t *recv_cmd_state_ptr,
 }
 
 
-
-
-
- 
-
 int main() {
-    usart_init( recv_cmd_state_ptr );
+    command_init( recv_cmd_state_ptr );
     char teststr[] = "junk  13\r"; 
     char *teststr_ptr = teststr;
     char individ_char[2] = "0"; // Individual character pulled from string

@@ -38,8 +38,15 @@ struct command_struct {
     fpointer_t execute; // The function to execute
     char *help;
 };
+/* The array of command structures will have global scope.  The variable
+ * command_array should be initialized in pd_command.c */
+extern struct command_struct command_array[];
 
 
+/* Making this function explicitly take a pointer to the received command
+ * state structure makes it clear that it modifies this structure.  This
+ * function will ultimately also have to set up the USART hardware. */
+void command_init( recv_cmd_state_t *recv_cmd_state_ptr );
 
 
 
@@ -58,3 +65,7 @@ int check_argsize(recv_cmd_state_t *recv_cmd_state_ptr ,
  * Process the command (if there is one) in the parse buffer. */
 void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
                     struct command_struct *command_array);
+                    
+/* Erases the received character buffer, resets the received character
+ * number, and resets the write pointer. */
+void rbuffer_erase( recv_cmd_state_t *recv_cmd_state_ptr );

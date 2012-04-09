@@ -3,6 +3,30 @@
 #include "pd_command.h"
 
 
+
+
+/* An array of command_structs will contain our remote commands */
+struct command_struct command_array[] ={
+    // The junk function
+    {"junk", // Name
+    "hex", // Argument type
+    2, // Maximum number of characters in argument
+    &junkfunc,
+    "Some junk"},
+    // The crap function
+    {"crap",
+    "none",
+    0,
+    &crapfunc,
+    "Some crap"},
+    // End of table indicator.  Must be last.
+    {"","",0,0,""}
+};
+
+
+
+
+
 int check_argsize(recv_cmd_state_t *recv_cmd_state_ptr ,
                     struct command_struct *command_array) {
     int isok = 0;
@@ -17,7 +41,13 @@ int check_argsize(recv_cmd_state_t *recv_cmd_state_ptr ,
     return isok;
 }
 
-
+void rbuffer_erase( recv_cmd_state_t *recv_cmd_state_ptr ) {
+    memset((recv_cmd_state_ptr -> rbuffer),0,RECEIVE_BUFFER_SIZE);
+    recv_cmd_state_ptr -> rbuffer_write_ptr =
+        recv_cmd_state_ptr -> rbuffer; // Initialize write pointer
+    recv_cmd_state_ptr -> rbuffer_count = 0;
+    return;
+}
 
 void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
                     struct command_struct *command_array) {
@@ -79,3 +109,21 @@ void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
     }
     return;
 }
+
+/* Making this function explicitly take a pointer to the received command
+ * state structure makes it clear that it modifies this structure.  This
+ * function will ultimately also have to set up the USART hardware. */
+void command_init( recv_cmd_state_t *recv_cmd_state_ptr ) {
+    memset((recv_cmd_state_ptr -> rbuffer),0,RECEIVE_BUFFER_SIZE);
+    recv_cmd_state_ptr -> rbuffer_write_ptr =
+        recv_cmd_state_ptr -> rbuffer; // Initialize write pointer
+    memset((recv_cmd_state_ptr -> pbuffer),0,PARSE_BUFFER_SIZE);
+    recv_cmd_state_ptr -> pbuffer_arg_ptr =
+        recv_cmd_state_ptr -> pbuffer; // Initialize argument pointer
+    recv_cmd_state_ptr -> rbuffer_count = 0;
+    recv_cmd_state_ptr -> pbuffer_lock = 0; // Parse buffer unlocked
+    return;
+}
+
+
+
