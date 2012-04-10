@@ -33,6 +33,8 @@
 ** DONE Draw state diagram for incoming commands
 ** DONE Prototype receive command flow
    - Call a function with a character representing that coming in over the USART.  This function will prototype the ISR we'll write for the AVR.  Call this receive_isr_proto(). 
+** TODO Make a function called slope
+   - Takes a hex number and writes it to the cal_struct
 ** TODO Port receive_isr_proto to the butterfly
 ** DONE Make a global structure to keep track of the received character state
    - Character count
