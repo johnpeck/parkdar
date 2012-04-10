@@ -9,20 +9,22 @@
 // Define the size of the parse buffer
 #define PARSE_BUFFER_SIZE 20
 
-/* Received command state structure. The idea is that I'll create
- * a structure to keep track of the state in every flow diagram I make.
- * I have a flow diagram for received characters, so I created this
- * structure. */
-typedef struct { 
+/* Received command state structure.  This is a collection of global 
+ * variables needed to set up and keep track of the remote command 
+ * interface.  A structure of this type must be instantiated in main.c
+ * so that it can work with the received character ISR. */
+typedef struct recv_cmd_struct { 
     char rbuffer[RECEIVE_BUFFER_SIZE]; // Received character buffer
-    // rbuffer_write_ptr will always point to the next write location
+    /* rbuffer_write_ptr will always point to the next write location
+     * in the received character buffer. */
     char *rbuffer_write_ptr;
-    // Parse buffer.  pbuffer will point to the beginning of the parse
-    // buffer, which will also be the beginning of the command to be
-    // processed.
+    /* Properly terminated strings will wait in the parse buffer to be
+     * processed.  These strings may or may not have one argument, separated
+     * from the command by 1 or a few spaces (the entire string isn't
+     * allowed to exceed the buffer size).  */
     char pbuffer[PARSE_BUFFER_SIZE];
     char *pbuffer_arg_ptr; // Points to the beginning of the argument
-    int rbuffer_count; // Number of chars sent to receive buffer
+    int rbuffer_count; // Counts up as characters go into receive buffer.
     int pbuffer_lock; // Parse buffer lock.  1 = locked
 } recv_cmd_state_t;
 
@@ -38,14 +40,15 @@ struct command_struct {
     fpointer_t execute; // The function to execute
     char *help;
 };
+
 /* The array of command structures will have global scope.  The variable
  * command_array should be initialized in pd_command.c */
 extern struct command_struct command_array[];
 
 
-/* Making this function explicitly take a pointer to the received command
- * state structure makes it clear that it modifies this structure.  This
- * function will ultimately also have to set up the USART hardware. */
+/* Initialize the received command state: Erase the buffers, reset
+ * the write and argument pointers, zero the received character
+ * counter, and unlock the parse buffer. */
 void command_init( recv_cmd_state_t *recv_cmd_state_ptr );
 
 

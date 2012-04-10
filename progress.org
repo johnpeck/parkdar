@@ -38,6 +38,7 @@
    - Character count
 ** DONE Make a flow diagram for command parsing
 ** TODO Figure out how to convert hex string to integer
+   - This can be rolled up with figuring out if my function pointers can take and return arguments.  I'll make a function that takes in a string of characters, and converts them to a number (if possible).
 ** DONE Rename usart_init to command_init, move over to pd_command
 ** TODO Move array of command_structs to a separate file
    - I'm failing to do this now because the process_pbuffer function needs the command array.  process_pbuffer is called from main().  So there needs to be a pointer to the array of remote commands available in main().  It seems like one thing I could do would be to write a function that creates the command array and returns a pointer to it.  There are probably better ways to do this, and I guess this is another question for Ray.

@@ -3,6 +3,8 @@
 *.o
 *.eep
 *.map
+*.elf
+*.hex
 
 # Listing files #
 ###################
