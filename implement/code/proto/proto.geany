@@ -17,13 +17,15 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=2
+current_page=7
 FILE_NAME_0=126;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/proto/main.c;0;4
 FILE_NAME_1=0;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/proto/pd_ranger.c;0;4
-FILE_NAME_2=94;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/proto/pd_ranger.h;0;4
-FILE_NAME_3=491;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/proto/pd_command.c;0;4
+FILE_NAME_2=0;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/proto/pd_ranger.h;0;4
+FILE_NAME_3=0;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/proto/pd_command.c;0;4
 FILE_NAME_4=1494;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/proto/pd_command.h;0;4
 FILE_NAME_5=0;Make;0;16;1;1;1;/home/john/projects/parkdar/implement/code/proto/makefile;0;4
+FILE_NAME_6=60;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/proto/pd_numbers.h;0;4
+FILE_NAME_7=914;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/proto/pd_numbers.c;0;4
 
 [VTE]
 last_dir=/home/john/projects/resgen
