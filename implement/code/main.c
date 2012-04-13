@@ -8,6 +8,7 @@
 #include "main.h"
 #include "LCD_driver.h"
 #include "LCD_functions.h"
+#include "pd_ranger.h"
 
 /* Define the size of the receive character buffer */
 #define RXBUFFERSIZE 20
@@ -511,8 +512,19 @@ ISR(TIMER0_COMP_vect) {
 }
 
 /* USART receive character interrupt */
+//ISR(USART0_RX_vect) {
+    //*rxWritePtr = UDR0;
+    //UDR0 = *rxWritePtr; // Echo back the received byte
+    //rxWritePtr++;
+//}
+
+
+
+
+    
+    
 ISR(USART0_RX_vect) {
-    *rxWritePtr = UDR0;
-    UDR0 = *rxWritePtr; // Echo back the received byte
-    rxWritePtr++;
+    if (UDR0 == '\r') {
+        usart_puts("Found a terminator\r\n");
+    }
 }

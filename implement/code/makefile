@@ -74,9 +74,11 @@ TARGET = main
 OBJDIR = .
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = $(TARGET).c
-SRC += LCD_driver.c
-SRC += LCD_functions.c
+SRC = 	$(TARGET).c \
+		LCD_driver.c \
+		LCD_functions.c \
+		pd_ranger.c
+
 
 # List C++ source files here. (C dependencies are automatically generated.)
 CPPSRC =

@@ -243,7 +243,7 @@ void LCD_AllSegments(char show)
 *
 *****************************************************************************/
 
-SIGNAL(SIG_LCD)
+ISR(LCD_vect)
 {
     static char LCD_timer = LCD_TIMER_SEED;
     char c;

@@ -1,7 +1,6 @@
 # Compiled source #
 ###################
 *.o
-*.o.d
 *.eep
 *.map
 *.elf
