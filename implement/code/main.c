@@ -67,7 +67,7 @@ int main(void) {
  void led(uint8_t state) {
     if (state == 1)
         PORTB |= _BV(PB6);
-    else
+        else
         PORTB &= ~(_BV(PB6));
 }
 

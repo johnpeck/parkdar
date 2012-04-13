@@ -25,17 +25,20 @@
 * DONE Connect mta100 header to J402
   - This is for ADC4 as shown in the [[file:implement/drawings/butterfly_connect.fig][drawing]].
 * DONE Modify code to select ADC4 as analog input.
-* TODO Add command parser for two commands [5/7]
+* TODO Add command parser for two commands [6/11]
 ** range?
 *** Returns calibrated range in inches from one of the latest measurements
 ** uncal?
 *** Returns uncalibrated ADC counts from one of the latest measurements
-** DONE Draw state diagram for incoming commands
-** DONE Prototype receive command flow
-   - Call a function with a character representing that coming in over the USART.  This function will prototype the ISR we'll write for the AVR.  Call this receive_isr_proto(). 
+** DONE Work on state diagram for incoming commands
+*** State diagram is [[file:implement/howto/figs/parse_cmd_flow.fig][here]].
+** DONE Work on state diagram for incoming characters
+*** State diagram is [[file:implement/howto/figs/recv_cmd_flow.fig][here]]. 
 ** TODO Make a function called slope
    - Takes a hex number and writes it to the cal_struct
-** TODO Port receive_isr_proto to the butterfly
+** TODO Port receive_isr_proto to the butterfly [0/2]
+*** TODO Remove existing scanRx from main() and from main.c, main.h
+*** TODO Copy over pd_command, add pd_command.h to main.c, and pd_command.c to makefile
 ** DONE Make a global structure to keep track of the received character state
    - Character count
 ** DONE Make a flow diagram for command parsing
