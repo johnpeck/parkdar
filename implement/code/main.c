@@ -1,4 +1,7 @@
 /* main.c */
+
+
+// ----------------------- Include files ------------------------------
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <util/delay.h>
@@ -10,10 +13,15 @@
 #include "LCD_functions.h"
 #include "pd_ranger.h"
 
-
 /* pd_command.h contains the extern declaration of command_array --
- * an array containing all the commands understood by the system. */
+ * an array containing all the commands understood by the system. 
+ * 
+ * Defines the received command state structure recv_cmd_state_t.  Use
+ * this to keep track of the remote interface state. */
 #include "pd_command.h"
+
+
+
 
 /* Define the size of the receive character buffer */
 #define RXBUFFERSIZE 20
@@ -28,6 +36,11 @@ volatile uint8_t doread = 0; // Report ADC data when doread is set in interrupt
 volatile char rxBuffer[RXBUFFERSIZE]; // Received character buffer
 volatile char cmdStrBuffer[CSTRBUFFERSIZE]; // Command string buffer
 volatile char * rxWritePtr = rxBuffer; // Walks through buffer for writing
+
+// Define a pointer to the received command state
+recv_cmd_state_t  recv_cmd_state;
+recv_cmd_state_t *recv_cmd_state_ptr = &recv_cmd_state;
+
 
 /* Definitions for led() */
 #define ON 1

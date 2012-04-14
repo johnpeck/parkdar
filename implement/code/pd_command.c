@@ -1,5 +1,11 @@
+/* pd_command.c */
+
+// ----------------------- Include files ------------------------------
 #include <stdio.h>
 #include <string.h>
+
+/* pd_command.h contains the extern declaration of command_array --
+ * an array containing all the commands understood by the system. */
 #include "pd_command.h"
 #include "pd_ranger.h"
 
