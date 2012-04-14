@@ -55,8 +55,7 @@ int main(void) {
             doread = 0;
         }
         else led(OFF);
-        scanRx();
-        
+
     }// end main for loop
 } // end main
 
@@ -71,44 +70,6 @@ int main(void) {
         PORTB &= ~(_BV(PB6));
 }
 
-/* scanRx()
- * Look at received character buffer to see if:
- * 1. Anything terminated by a \r has shown up.  This is a command and
- *    should be processed.
- * 2. The buffer is almost full without a \r showing up.  The buffer
- *    should just be cleared. */
-void scanRx(void) {
-    char rxToken[20];
-    char outStr[40];
-    char * rxScanPtr = rxBuffer; // Walks through buffer for scanning
-    uint8_t retval = 0;
-    memset(rxToken,0,20);
-    /* Scan the command buffer for first occurance of \r */
-    char * rxTermPtr = strchr(rxBuffer,'\r'); // Finds command terminator
-    uint8_t rxCharnum = strlen(rxBuffer); // Find characters in receive buffer
-    if (rxTermPtr != NULL) {
-        int count = 0;
-        while (rxScanPtr != rxTermPtr) {
-            rxToken[count] = *rxScanPtr;
-            rxScanPtr++;
-            count++;
-        };
-        usart_puts("\r\n"); // Leave whatever was typed on the terminal
-        /* Copy the command string to the global command string buffer.
-         * We'll then erase the received character buffer. */
-        strcpy(cmdStrBuffer,rxToken);  
-        retval = sprintf(outStr,"The command string is %s\r\n",cmdStrBuffer);
-        usart_puts(outStr);
-        memset(rxBuffer,0,RXBUFFERSIZE); // Re-initialize the receive buffer
-        rxScanPtr = rxBuffer; // Move the scanning pointer back to the beginning
-        rxWritePtr = rxBuffer; // Move writing back to the beginning
-    }
-    else if ( rxCharnum > (RXBUFFERSIZE >> 1)) {
-        usart_puts("Buffer overflow!\r\n");
-        memset(rxBuffer,0,RXBUFFERSIZE); // Re-initialize the receive buffer
-        rxWritePtr = rxBuffer; // Move writing back to the beginning
-    };
-}
 
 
 /* portb_init()
