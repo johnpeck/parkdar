@@ -77,7 +77,8 @@ OBJDIR = .
 SRC = 	$(TARGET).c \
 		LCD_driver.c \
 		LCD_functions.c \
-		pd_ranger.c
+		pd_ranger.c \
+		pd_command.c
 
 
 # List C++ source files here. (C dependencies are automatically generated.)

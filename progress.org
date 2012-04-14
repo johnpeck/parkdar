@@ -36,9 +36,9 @@
 *** State diagram is [[file:implement/howto/figs/recv_cmd_flow.fig][here]]. 
 ** TODO Make a function called slope
    - Takes a hex number and writes it to the cal_struct
-** TODO Port receive_isr_proto to the butterfly [1/2]
+** TODO Port receive_isr_proto to the butterfly [2/2]
 *** DONE Remove existing scanRx from main() and from main.c, main.h
-*** TODO Copy over pd_command, add pd_command.h to main.c, and pd_command.c to makefile
+*** DONE Copy over pd_command, add pd_command.h to main.c, and pd_command.c to makefile
 ** DONE Make a global structure to keep track of the received character state
    - Character count
 ** DONE Make a flow diagram for command parsing
