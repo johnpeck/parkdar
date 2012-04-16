@@ -13,7 +13,8 @@
 #include "LCD_functions.h"
 #include "pd_ranger.h"
 
-/* pd_command.h contains the extern declaration of command_array --
+/* pd_command.h 
+ * Contains the extern declaration of command_array --
  * an array containing all the commands understood by the system. 
  * 
  * Defines the received command state structure recv_cmd_state_t.  Use
@@ -48,8 +49,7 @@ recv_cmd_state_t *recv_cmd_state_ptr = &recv_cmd_state;
 
 
 int main(void) {
-    memset(rxBuffer,0,RXBUFFERSIZE); // Initialize buffers
-    memset(cmdStrBuffer,0,CSTRBUFFERSIZE); 
+    command_init( recv_cmd_state_ptr );
     int16_t adc_data = 0; // Allow for up to 64 averages
     sei(); // Enable interrupts
     fosc_cal(); // Set calibrated 1MHz system clock
@@ -477,7 +477,7 @@ void fosc_cal(void) {
 
 
 
-/* Interrupt
+/* -------------------------- Interrupts -------------------------------
  * Find the name of this interrupt signal in iom169p.h and not pa.  Why
  * not?  We define the mcu name to be atmega169p in the makefile, not
  * atmega169pa. 
@@ -485,25 +485,71 @@ void fosc_cal(void) {
  * See the naming convention outlined at
  * http://www.nongnu.org/avr-libc/user-manual/group__avr__interrupts.html
  * to make sure you don't use depricated names. */
+ 
+
+/* Interrupt on timer0 */
 ISR(TIMER0_COMP_vect) {
     /* The interrupt code goes here. */
     doread = 1;
 }
 
-/* USART receive character interrupt */
-//ISR(USART0_RX_vect) {
-    //*rxWritePtr = UDR0;
-    //UDR0 = *rxWritePtr; // Echo back the received byte
-    //rxWritePtr++;
-//}
 
-
-
-
-    
-    
+/* Interrupt on character received via the USART */
 ISR(USART0_RX_vect) {
-    if (UDR0 == '\r') {
+    char logstring[80];
+    *(recv_cmd_state_ptr -> rbuffer_write_ptr) = UDR0; // Write the received character to the buffer
+    if (*(recv_cmd_state_ptr -> rbuffer_write_ptr) == '\r') {
         usart_puts("Found a terminator\r\n");
+        if ((recv_cmd_state_ptr -> rbuffer_count) == 0) {
+            /* We got a terminator, but the received character buffer is
+             * empty.  The user is trying to clear the transmit and
+             * receive queues. */
+            return;
+        }
+        else {
+            if ((recv_cmd_state_ptr -> pbuffer_lock) == 1) {
+                /* We got a terminator, and there are characters in the received
+                 * character buffer, but the parse buffer is locked.  This is
+                 * bad -- we're receiving commands faster than we can process
+                 * them. */
+                sprintf(logstring,"Command process speed error!\r\n");
+                usart_puts(logstring);
+                rbuffer_erase(recv_cmd_state_ptr);
+                return;
+            }
+            else {
+                /* We got a terminator, and there are characters in the received
+                 * character buffer.  The parse buffer is unlocked so terminate
+                 * the received string and copy it to the parse buffer. */
+                *(recv_cmd_state_ptr -> rbuffer_write_ptr) = '\0';
+                strcpy((recv_cmd_state_ptr -> pbuffer),
+                    (recv_cmd_state_ptr -> rbuffer));
+                //recv_cmd_state_ptr -> pbuffer_lock = 1;
+                sprintf(logstring,"Parse buffer contains %s\r\n",
+                    (recv_cmd_state_ptr -> pbuffer));
+                usart_puts(logstring);
+                rbuffer_erase(recv_cmd_state_ptr);
+                return;
+            }
+        }
     }
+    else {
+        sprintf(logstring,"%c  <-- Not a terminator.  Received count is %d\r\n",
+            *(recv_cmd_state_ptr -> rbuffer_write_ptr),recv_cmd_state_ptr -> rbuffer_count);
+        usart_puts(logstring);
+        if ((recv_cmd_state_ptr -> rbuffer_count) >=
+            (RECEIVE_BUFFER_SIZE-1)) {
+            sprintf(logstring,"Received character number above limit.\r\n");
+            usart_puts(logstring);
+            rbuffer_erase(recv_cmd_state_ptr);
+            return;
+        }
+        else {
+            // Increment the received character count
+            (recv_cmd_state_ptr -> rbuffer_count)++;
+            // Increment the write pointer
+            (recv_cmd_state_ptr -> rbuffer_write_ptr)++;
+        }
+    }
+    return;
 }
