@@ -3,7 +3,10 @@ CC=gcc
 # Use these compiler options.
 CFLAGS=-std=gnu99
 
-SOURCES=main.c pd_command.c pd_ranger.c
+SOURCES=main.c \
+		pd_command.c \
+		pd_ranger.c \
+		pd_usart.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=proto
 
