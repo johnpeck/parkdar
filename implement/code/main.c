@@ -20,23 +20,19 @@
  * Defines the received command state structure recv_cmd_state_t.  Use
  * this to keep track of the remote interface state. */
 #include "pd_command.h"
+#include "pd_usart.h"
 
 
 
 
-/* Define the size of the receive character buffer */
-#define RXBUFFERSIZE 20
-/* Define the size of the command string buffer */
-#define CSTRBUFFERSIZE 20
+
 
 /* Global variables */
 /* Calibration slope is in mils per count */
 const int16_t cal_slop = -500; // Slope calibration factor for rangefinder
 const int16_t cal_offs = 0x1c3; // Offset calibration factor for rangefinder
 volatile uint8_t doread = 0; // Report ADC data when doread is set in interrupt
-volatile char rxBuffer[RXBUFFERSIZE]; // Received character buffer
-volatile char cmdStrBuffer[CSTRBUFFERSIZE]; // Command string buffer
-volatile char * rxWritePtr = rxBuffer; // Walks through buffer for writing
+
 
 // Define a pointer to the received command state
 recv_cmd_state_t  recv_cmd_state;
@@ -181,37 +177,11 @@ void timer0_stop(void) {
     TCCR0A &= ~( (1<<CS02) | (1<<CS01) | (1<<CS00) );
 }
 
-/* usart_receive
- * Simple USART receive function based on polling of the receive
- * complete (RXCn) flag.  The Butterfly has only one USART, so n will
- * always be zero.  The USART must be initialized before this can be used.
- *
- * The function simply waits for data to be present in the receive buffer
- * by checking the RXCn flag.  This flag is set when data is present. */
-unsigned char usart_receive(void) {
-    while( !(UCSR0A & (1<<RXC0)));
-    return UDR0;
-}
 
-/* usart_putc(char data)
- * Sends a character to the USART */
-void usart_putc(char data) {
-    /* Wait for empty transmit buffer */
-    while( !( UCSR0A & (1<<UDRE0)) );
-    /* Put data into buffer -- sends the data */
-    UDR0 = data;
-}
 
-/* usart_puts(char s[])
- * Sends a string over the USART by repeatedly calling usart_putc() */
-void usart_puts(char s[]) {
-    int i = 0;
-    while(i < 64) // don't get stuck if it is a bad string
-    {
-        if( s[i] == '\0' ) break; // quit on string terminator
-        usart_putc(s[i++]);
-    }
-}
+
+
+
 
 /* Initialize the ADC.  The butterfly has a 10-bit ADC multiplexed
  * into 8 channels. */
@@ -334,28 +304,7 @@ void adc_report(int16_t repdata) {
  }
      
 
-/* usart_init()
- * Initialize the USART.  The butterfly only has one USART, so all the
- * n values for configuration registers are 0. */
-void usart_init(void) {
-    /* Set the USART baudrate registers for 9600.  With a fosc of 1MHz,
-     * and double speed operation enabled, this means UBRR0 = 12.  UBRR
-     * is a 12-bit register, so it has a high and a low byte. */
-    UBRR0H = 0;
-    UBRR0L = 12;
 
-    /* Set double speed mode. */
-    UCSR0A = (1<<U2X0);
-
-    /* Configure USART control register B */
-    UCSR0B = (1<<RXEN0)|(1<<TXEN0); // Enable receiver and transmitter.
-    UCSR0B |= (1<<RXCIE0); // Enable receive complete interrupts.
-    UCSR0B |= (0<<TXCIE0); // Enable transmit complete interrupts (not right now).
-    UCSR0B |= (0<<UDRIE0); // Enable data registter empty interrupts (not right now).
-
-    /* Set the USART to asynchronous at 8 bits no parity and 1 stop bit */
-    UCSR0C = (0<<UMSEL0)|(0<<UPM00)|(0<<USBS0)|(3<<UCSZ00)|(0<<UCPOL0);
-}
 
 /* fosc_cal(void)
  * This sets the frequency of the system clock provided by the internal
@@ -496,10 +445,10 @@ ISR(TIMER0_COMP_vect) {
 
 /* Interrupt on character received via the USART */
 ISR(USART0_RX_vect) {
-    char logstring[80];
+    uint8_t retval = 0;
     *(recv_cmd_state_ptr -> rbuffer_write_ptr) = UDR0; // Write the received character to the buffer
     if (*(recv_cmd_state_ptr -> rbuffer_write_ptr) == '\r') {
-        usart_puts("Found a terminator\r\n");
+        usart_printf("Found a terminator\r\n");
         if ((recv_cmd_state_ptr -> rbuffer_count) == 0) {
             /* We got a terminator, but the received character buffer is
              * empty.  The user is trying to clear the transmit and
@@ -512,8 +461,7 @@ ISR(USART0_RX_vect) {
                  * character buffer, but the parse buffer is locked.  This is
                  * bad -- we're receiving commands faster than we can process
                  * them. */
-                sprintf(logstring,"Command process speed error!\r\n");
-                usart_puts(logstring);
+                usart_printf("Command process speed error!\r\n");
                 rbuffer_erase(recv_cmd_state_ptr);
                 return;
             }
@@ -525,22 +473,19 @@ ISR(USART0_RX_vect) {
                 strcpy((recv_cmd_state_ptr -> pbuffer),
                     (recv_cmd_state_ptr -> rbuffer));
                 //recv_cmd_state_ptr -> pbuffer_lock = 1;
-                sprintf(logstring,"Parse buffer contains %s\r\n",
+                usart_printf("Parse buffer contains %s\r\n",
                     (recv_cmd_state_ptr -> pbuffer));
-                usart_puts(logstring);
                 rbuffer_erase(recv_cmd_state_ptr);
                 return;
             }
         }
     }
     else {
-        sprintf(logstring,"%c  <-- Not a terminator.  Received count is %d\r\n",
-            *(recv_cmd_state_ptr -> rbuffer_write_ptr),recv_cmd_state_ptr -> rbuffer_count);
-        usart_puts(logstring);
-        if ((recv_cmd_state_ptr -> rbuffer_count) >=
-            (RECEIVE_BUFFER_SIZE-1)) {
-            sprintf(logstring,"Received character number above limit.\r\n");
-            usart_puts(logstring);
+        retval = usart_printf("%c  <-- Not a terminator.  Received count is %d\r\n",
+            *(recv_cmd_state_ptr -> rbuffer_write_ptr),
+            recv_cmd_state_ptr -> rbuffer_count);
+        if ((recv_cmd_state_ptr -> rbuffer_count) >= (RECEIVE_BUFFER_SIZE-1)) {
+            retval = usart_printf("Received character number above limit.\r\n");
             rbuffer_erase(recv_cmd_state_ptr);
             return;
         }

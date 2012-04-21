@@ -11,12 +11,7 @@ void range_report(int16_t *adc_data);
 void adc_report(int16_t data);
 void getdata(void);
 void fosc_cal(void);
-void usart_putc(char );
-void usart_puts(char *);
-void usart_init(void);
-unsigned char usart_receive(void);
 void led(uint8_t state);
-
 void timer0_init(void);
 void timer0_start(void);
 void timer0_stop(void);

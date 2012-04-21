@@ -25,7 +25,7 @@
 * DONE Connect mta100 header to J402
   - This is for ADC4 as shown in the [[file:implement/drawings/butterfly_connect.fig][drawing]].
 * DONE Modify code to select ADC4 as analog input.
-* TODO Add command parser for two commands [6/9]
+* TODO Add command parser for two commands [8/12]
 ** range?
 *** Returns calibrated range in inches from one of the latest measurements
 ** uncal?
@@ -40,7 +40,6 @@
 *** DONE Remove existing scanRx from main() and from main.c, main.h
 *** DONE Copy over pd_command, add pd_command.h to main.c, and pd_command.c to makefile
 *** DONE Make ISR write to the new command status structure
-** TODO Write a usart_printf function to make printing formatted strings to the usart easier.
 ** TODO Write a logging function that can be turned on or off
    - If logging is turned on, you'll see things like 4 --> not a terminator.
 ** DONE Make a global structure to keep track of the received character state
@@ -51,7 +50,7 @@
 ** DONE Rename usart_init to command_init, move over to pd_command
 ** TODO Move array of command_structs to a separate file
    - I'm failing to do this now because the process_pbuffer function needs the command array.  process_pbuffer is called from main().  So there needs to be a pointer to the array of remote commands available in main().  It seems like one thing I could do would be to write a function that creates the command array and returns a pointer to it.  There are probably better ways to do this, and I guess this is another question for Ray.
-** TODO Write proposal letter to circuit cellar
+** DONE Write proposal letter to circuit cellar
 * TODO Add section on command parsing to the howto
 * TODO Adjust one pencil channel's offset to 3.3V
 * TODO Stock pencils power supply rise time is too slow
