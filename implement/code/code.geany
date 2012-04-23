@@ -18,18 +18,18 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=9
-FILE_NAME_0=12877;Make;0;16;1;1;0;/home/john/projects/parkdar/implement/code/makefile;0;4
-FILE_NAME_1=528;C;0;16;0;1;0;/home/john/projects/parkdar/implement/code/main.h;0;4
-FILE_NAME_2=18034;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/main.c;0;4
+current_page=8
+FILE_NAME_0=2448;Make;0;16;1;1;0;/home/john/projects/parkdar/implement/code/makefile;0;4
+FILE_NAME_1=420;C;0;16;0;1;0;/home/john/projects/parkdar/implement/code/main.h;0;4
+FILE_NAME_2=631;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/main.c;0;4
 FILE_NAME_3=2135;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/LCD_functions.c;0;4
 FILE_NAME_4=7308;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/LCD_driver.c;0;4
-FILE_NAME_5=2971;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/proto/proto.c;0;4
-FILE_NAME_6=427;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/pd_ranger.h;0;4
-FILE_NAME_7=225;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/pd_ranger.c;0;4
-FILE_NAME_8=1041;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/pd_command.h;0;4
-FILE_NAME_9=426;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/pd_command.c;0;4
-FILE_NAME_10=2047;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/proto/main.c;0;4
+FILE_NAME_5=427;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/pd_ranger.h;0;4
+FILE_NAME_6=0;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/pd_ranger.c;0;4
+FILE_NAME_7=0;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/pd_command.h;0;4
+FILE_NAME_8=2853;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/pd_command.c;0;4
+FILE_NAME_9=584;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/pd_usart.c;0;4
+FILE_NAME_10=91;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/pd_usart.h;0;4
 
 [VTE]
 last_dir=/home/john/projects/resgen
