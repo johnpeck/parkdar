@@ -6,10 +6,17 @@
  * an array containing all the commands understood by the system. */
 #include "pd_command.h"
 
+/* pd_logger.h sets up logging */
+#include "pd_logger.h"
+
 
 // Define a pointer to the received command state
 recv_cmd_state_t  recv_cmd_state;
 recv_cmd_state_t *recv_cmd_state_ptr = &recv_cmd_state;
+
+// Define a pointer to the logging configuration
+logger_config_t logger_config;
+logger_config_t *logger_config_ptr = &logger_config;
 
 
 /* receive_isr_proto(char)
