@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "pd_command.h"
+#include "pd_ranger.h"
 
 
 

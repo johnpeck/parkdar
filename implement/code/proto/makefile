@@ -6,7 +6,6 @@ CFLAGS=-std=gnu99
 SOURCES=main.c \
 		pd_command.c \
 		pd_ranger.c \
-		pd_usart.c \
 		pd_logger.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=proto

@@ -5,21 +5,21 @@
  
  
 /* Internal systems recognized by the logger */
-typedef enum {
-    RANGER,
-    COMMAND,
-    NONE,
-    ALL
+typedef enum log_system {
+    log_system_RANGER,
+    log_system_COMMAND,
+    log_system_NONE,
+    log_system_ALL
 } log_system_t;
 
 /* Log levels recognized by the logger.  Logging can be configured to
  * only output messages above a certain level, with ALL being the lowest. */
-typedef enum {
-    ALL,
-    INFO,
-    WARNING,
-    ERROR,
-    NONE
+typedef enum log_level {
+    log_level_ALL,
+    log_level_INFO,
+    log_level_WARNING,
+    log_level_ERROR,
+    log_level_NONE
 } log_level_t;
 
 /* Define fpointer_t to have the type "pointer to function," a return
@@ -33,10 +33,6 @@ typedef struct logger_config_struct {
     log_level_t stopon; // Halt when a message is issued at this level
     log_fptr_t execute; // What to execute
 } logger_config_t;
-
-/* Define fpointer_t to have the type "pointer to function," a return
- * value of void, and a parameter type of void. */
-typedef int (*log_fptr_t)(); 
 
 /* Turn logging on. */
 void logger_start( log_system_t );

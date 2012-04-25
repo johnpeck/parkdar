@@ -47,7 +47,9 @@
    - This can be rolled up with figuring out if my function pointers can take and return arguments.  I'll make a function that takes in a string of characters, and converts them to a number (if possible).
 * TODO Add logging system that can be turned on and off
 ** The logging system needs
-*** To be able to be turned on and off
+*** TODO Implement logger_start
+    DEADLINE: <2012-04-25 Wed>
+    - Call it in main() so that it gets used
 *** Log calls must be separated by system, logging level, and message
 **** Log levels: information, warning, error
 **** Log systems: ranger, command
