@@ -10,6 +10,7 @@
 typedef enum log_system {
     log_system_RANGER,
     log_system_COMMAND,
+    log_system_LOGGER,
     log_system_NONE,
     log_system_ALL
 } log_system_t;
@@ -32,21 +33,22 @@ typedef void (*log_fptr_t)(void);
 typedef struct logger_config_struct { 
     log_system_t suppress; // Suppress messages from this system
     log_system_t only; // Only display messages from this system
+    log_level_t loglevel; // Only display messages at or above this level
     log_level_t stopon; // Halt when a message is issued at this level
-    log_fptr_t execute; // What to execute
 } logger_config_t;
 
-/* Turn logging on. */
-void logger_start( log_system_t );
 
-/* Turn logging off */
-void logger_stop( log_system_t );
+/* Initialize the logging system to a set of defaults. */  
+void logger_init();
 
-/* Initialize the logging system */ 
-void logger_init( logger_config_t ); 
+/* Set the log level 
+ * Messages with loglevels above this setting will be logged.
+ * Set log_level_NONE to turn logging off completely. 
+ * Set log level_ALL to log messages with all loglevels. */
+void logger_setlevel( log_level_t );
 
-/* Set the log level */
-void logger_level( log_level_t );
+/* Set the system or systems to log */
+void logger_setsystem( log_system_t );
 
 /* Allow for format strings in the log message */
 void logger_msg( log_system_t, log_level_t, char *logmsg, ... ); 

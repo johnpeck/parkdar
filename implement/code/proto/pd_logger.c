@@ -11,18 +11,29 @@
 logger_config_t logger_config;
 logger_config_t *logger_config_ptr = &logger_config;
 
-void logger_start( log_system_t logsys) {
-    (logger_config_ptr -> only) = logsys; 
-    
-    switch( logsys ) {
-        case log_system_RANGER:
-            printf("Now logging ranger system\n");
-            break;
-        case log_system_COMMAND:
-            printf("Now logging command system\n");
-            break;
-    }
+
+
+void logger_init() {
+    logger_config_ptr -> suppress = log_system_NONE;
+    logger_config_ptr -> only = log_system_NONE;
+    logger_config_ptr -> stopon = log_level_NONE;
 }
+
+void logger_setlevel( log_level_t loglevel ) {
+    logger_config_ptr -> loglevel = loglevel;
+    logger_msg( log_system_LOGGER, log_level_INFO,
+                "Logging set to level %i\n",loglevel);
+}
+
+void logger_setsystem( log_system_t logsys ) {
+    logger_config_ptr -> only = logsys;
+    logger_msg( log_system_LOGGER, log_level_INFO,
+                "Now logging system %i\n",logsys);
+}
+
+
+
+
 
 void logger_msg( log_system_t logsys, log_level_t loglevel,char *logmsg, ... ) {
     va_list args; 
@@ -34,17 +45,12 @@ void logger_msg( log_system_t logsys, log_level_t loglevel,char *logmsg, ... ) {
     i = vsprintf (printbuffer, logmsg, args); 
     va_end (args); 
     
-    /* Check the level of the logging message.  The ALL loglevel should 
-     * cause all messages to be printed */
-    switch( loglevel ) {
-        case log_level_ALL:
-        case log_level_INFO:
-            logger_system_filter( logsys, printbuffer );
-        case log_level_WARNING:
-        case log_level_ERROR:
-        case log_level_NONE:
-            break;
+    if (loglevel >= (logger_config_ptr -> loglevel)) {
+        logger_system_filter( logsys, printbuffer );
     }
+    
+    
+  
 }
 
 void logger_system_filter( log_system_t logsys, char *logmsg ) {
@@ -52,7 +58,7 @@ void logger_system_filter( log_system_t logsys, char *logmsg ) {
     while ( logsys_iter != log_system_ALL ) {
         printf("Checking system %i\n",logsys_iter);
         if ( logsys == logsys_iter ) {
-            printf(logmsg);
+            printf("%s",logmsg);
         }
         logsys_iter++;
     }

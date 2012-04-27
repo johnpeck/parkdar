@@ -66,7 +66,8 @@ void receive_isr_proto( recv_cmd_state_t *recv_cmd_state_ptr,
 
 
 int main() {
-    logger_start(log_system_COMMAND); 
+    logger_init(); 
+    logger_setlevel( log_level_INFO );
     logger_msg( log_system_COMMAND,log_level_INFO,"My log message" );
     command_init( recv_cmd_state_ptr );
     char teststr[] = "junk  13\r"; 
