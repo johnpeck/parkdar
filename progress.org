@@ -47,9 +47,13 @@
    - This can be rolled up with figuring out if my function pointers can take and return arguments.  I'll make a function that takes in a string of characters, and converts them to a number (if possible).
 * TODO Add logging system that can be turned on and off
 ** The logging system needs
-*** TODO Implement logger_start
+*** DONE Implement logger_start
     DEADLINE: <2012-04-25 Wed>
     - Call it in main() so that it gets used
+*** TODO Fix logger_msg
+    - There must be a better way of separating the messages by level
+*** TODO Implement logger_init
+    - This should set default log levels and systems.
 *** Log calls must be separated by system, logging level, and message
 **** Log levels: information, warning, error
 **** Log systems: ranger, command

@@ -2,7 +2,9 @@
  * 
  * Functions for handling log messages. 
  */
- 
+
+/* Define the maximum log message size */
+#define LOGGER_BUFFERSIZE 80
  
 /* Internal systems recognized by the logger */
 typedef enum log_system {
@@ -48,3 +50,6 @@ void logger_level( log_level_t );
 
 /* Allow for format strings in the log message */
 void logger_msg( log_system_t, log_level_t, char *logmsg, ... ); 
+
+/* Only print messages meant for the specified system */
+void logger_system_filter( log_system_t, char *logmsg );

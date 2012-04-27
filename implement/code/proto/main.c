@@ -2,6 +2,7 @@
 #include <string.h>
 #include "pd_ranger.h"
 
+
 /* pd_command.h contains the extern declaration of command_array --
  * an array containing all the commands understood by the system. */
 #include "pd_command.h"
@@ -14,9 +15,7 @@
 recv_cmd_state_t  recv_cmd_state;
 recv_cmd_state_t *recv_cmd_state_ptr = &recv_cmd_state;
 
-// Define a pointer to the logging configuration
-logger_config_t logger_config;
-logger_config_t *logger_config_ptr = &logger_config;
+
 
 
 /* receive_isr_proto(char)
@@ -67,6 +66,8 @@ void receive_isr_proto( recv_cmd_state_t *recv_cmd_state_ptr,
 
 
 int main() {
+    logger_start(log_system_COMMAND); 
+    logger_msg( log_system_COMMAND,log_level_INFO,"My log message" );
     command_init( recv_cmd_state_ptr );
     char teststr[] = "junk  13\r"; 
     char *teststr_ptr = teststr;
