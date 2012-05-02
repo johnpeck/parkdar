@@ -47,18 +47,21 @@
    - This can be rolled up with figuring out if my function pointers can take and return arguments.  I'll make a function that takes in a string of characters, and converts them to a number (if possible).
 * TODO Add logging system that can be turned on and off
 ** The logging system needs
+*** DONE Document logging levels in h file
 *** DONE Implement logger_start
     DEADLINE: <2012-04-25 Wed>
     - Call it in main() so that it gets used
-*** TODO Fix logger_msg
+*** DONE Fix logger_msg
     - There must be a better way of separating the messages by level
 *** DONE Implement logger_init
     - This should set default log levels and systems.
 *** Log calls must be separated by system, logging level, and message
 **** Log levels: information, warning, error
 **** Log systems: ranger, command
-*** TODO Make the printing mechanism more modular for the logger
+*** DONE Make the printing mechanism more modular for the logger
     - Ideally, you would just give the logger system the name of the function you want to use to print strings (not even formatted strings, since we use sprintf for that)
+*** TODO Implement suppressing log messages from one system
+    - This enum log system is crap.  I need to switch to an one-hot encoding for systems.  Let's just say that 16 systems will be enough, and define bit shifts for each system.
 * TODO Add section on command parsing to the howto
 * TODO Adjust one pencil channel's offset to 3.3V
 * TODO Stock pencils power supply rise time is too slow

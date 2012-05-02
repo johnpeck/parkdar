@@ -47,11 +47,25 @@ void logger_init();
  * Set log level_ALL to log messages with all loglevels. */
 void logger_setlevel( log_level_t );
 
-/* Set the system or systems to log */
+/* Set the system or systems to log.  You can set this to log_system_ALL
+ * to log all systems, or to one specific system to log that system
+ * only. */
 void logger_setsystem( log_system_t );
 
-/* Allow for format strings in the log message */
+/* Set the system or systems from which to suppress log messages.  You can
+ * set this to log_system_ALL to suppress all log messages, or to one
+ * specific system to suppress that system only. */
+void logger_blocksystem( log_system_t );
+
+/* The interface to the logging system.  Programs should use this function
+ * to send format strings to the logging device.  The actual logging device
+ * should be chosen by modifying the logger_output() function. */
 void logger_msg( log_system_t, log_level_t, char *logmsg, ... ); 
 
 /* Only print messages meant for the specified system */
 void logger_system_filter( log_system_t, char *logmsg );
+
+/* Choose the logging device -- how the log messages will actually be
+ * printed out or saved.  During prototyping on the PC, this can just
+ * be printf(). */
+void logger_output( char *logmsg );
