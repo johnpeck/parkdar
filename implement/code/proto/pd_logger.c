@@ -5,47 +5,64 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h> // Allows functions to accept an indefinite number of arguments
+#include <stdint.h> // Defines uint8_t
 #include "pd_logger.h"
 
 // Define a pointer to the logging configuration
 logger_config_t logger_config;
 logger_config_t *logger_config_ptr = &logger_config;
 
-
+/* An array of system_structs will contain our system definitions for
+ * logging. */
+struct system_struct system_array[] ={
+    // The logger system
+    {"logger", // Name
+    0 // Bitshift -- bit location in logging configuration bitfields
+    },
+    // The command system
+    {"command",
+    1
+    },
+    // End of table indicator.  Must be last.
+    {"",0}
+};
 
 void logger_init() {
-    logger_config_ptr -> suppress = log_system_NONE;
-    logger_config_ptr -> only = log_system_NONE;
-    logger_config_ptr -> stopon = log_level_NONE;
+    logger_config_ptr -> enable = 0xff; /* Logs from all systems enabled
+                                         * by default. */
+    logger_config_ptr -> loglevel = log_level_ALL;
 }
 
 void logger_setlevel( log_level_t loglevel ) {
     logger_config_ptr -> loglevel = loglevel;
-    logger_msg( log_system_LOGGER, log_level_INFO,
+    logger_msg( "logger", log_level_INFO,
                 "Logging set to level %i\n",loglevel);
 }
 
-void logger_setsystem( log_system_t logsys ) {
-    logger_config_ptr -> only = logsys;
-    logger_msg( log_system_LOGGER, log_level_INFO,
-                "Now logging system %i\n",logsys);
+void logger_setsystem( char *logsys ) {
+    struct system_struct *system_array_ptr = system_array;
+    // Go through all systems looking for a match to the system name
+    while (strcmp( system_array_ptr -> name, "" ) != 0) {
+        if (strcmp( logsys, system_array_ptr -> name ) == 0) {
+            // We've found a matching system
+            (logger_config_ptr -> enable) |= (1<< (system_array_ptr -> bitshift));
+            logger_msg("logger", log_level_INFO, 
+                "Now logging system %s\n", system_array_ptr -> name);
+            break;
+        }
+        system_array_ptr++;
+    }
     return;
 }
 
-void logger_blocksystem( log_system_t logsys ) {
-    logger_config_ptr -> suppress = logsys;
-    logger_msg( log_system_LOGGER, log_level_INFO,
-                "Now suppressing system %i log messages.\n",logsys);
+void logger_disable() {
+    logger_config_ptr -> enable = 0;
     return;
 }
 
-
-
-
-
-void logger_msg( log_system_t logsys, log_level_t loglevel,char *logmsg, ... ) {
+void logger_msg( char *logsys, log_level_t loglevel,char *logmsg, ... ) {
     va_list args; 
-    int i; 
+    uint8_t i; 
     char printbuffer[LOGGER_BUFFERSIZE]; 
     
     va_start (args, logmsg); 
@@ -60,33 +77,31 @@ void logger_msg( log_system_t logsys, log_level_t loglevel,char *logmsg, ... ) {
     }
 }
 
-void logger_system_filter( log_system_t logsys, char *logmsg ) {
-    log_system_t logsys_iter = 0;
-    // Do we need to suppress this message?
-    if ((logger_config_ptr -> suppress) != log_system_NONE) {
-        // We have a system to suppress
-        if ((logger_config_ptr -> suppress) == log_system_ALL) {
-            // We need to suppress all messages, so just get out
-            return;
+void logger_system_filter( char *logsys, char *logmsg ) {
+    char sysname[LOGGER_BUFFERSIZE];
+    struct system_struct *system_array_ptr = system_array;
+    // Go through all systems looking for a match to the system name
+    while (strcmp( system_array_ptr -> name, "" ) != 0) {
+        if (strcmp( logsys, system_array_ptr -> name ) == 0) {
+            // We've found a matching system
+            if ((logger_config_ptr -> enable) & 
+                (1<< (system_array_ptr -> bitshift))) {
+                /* The system is enabled for logging.  Send two strings
+                 * to the logging device: 
+                 * 1. (name of the system)
+                 * 2. Log message */
+                snprintf(sysname,LOGGER_BUFFERSIZE,"(%s) ",
+                    system_array_ptr -> name);
+                logger_output(sysname);
+                logger_output(logmsg);
+            break;
+            }
         }
-        else if ((logger_config_ptr -> suppress) == logsys) {
-            // We need to suppress this system's logmessage, so get out
-            return;
-        }
+        system_array_ptr++;
     }
-    // Are we just logging everything?
-    if ((logger_config_ptr -> only) != log_system_ALL) {
-    
-    while ( logsys_iter != log_system_ALL ) {
-        if ( logsys == logsys_iter ) {
-            /* If the system specified by the log message matches the system
-             * set by this iteration, send the message on to the output
-             * device. */
-            logger_output(logmsg);
-        }
-        logsys_iter++;
-    }
+    return;
 }
+
 
 void logger_output( char *logmsg ) {
     printf("%s",logmsg);

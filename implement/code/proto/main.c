@@ -44,7 +44,8 @@ void receive_isr_proto( recv_cmd_state_t *recv_cmd_state_ptr,
         }
     }
     else {
-        printf("  <-- Not a terminator.  Received count is %d\r\n",
+        logger_msg("command",log_level_INFO,
+            "  <-- Not a terminator.  Received count is %d\r\n",
             recv_cmd_state_ptr -> rbuffer_count);
         if ((recv_cmd_state_ptr -> rbuffer_count) >=
             (RECEIVE_BUFFER_SIZE-1)) {
@@ -67,10 +68,10 @@ void receive_isr_proto( recv_cmd_state_t *recv_cmd_state_ptr,
 
 int main() {
     logger_init(); 
-    logger_blocksystem( log_system_NONE );
-    logger_setlevel( log_level_ALL );
-    logger_setsystem( log_system_ALL );
-    logger_msg( log_system_COMMAND,log_level_INFO,"My log message\n" );
+    logger_disable();
+    logger_setsystem( "logger" );
+    logger_setsystem( "command" );
+    logger_msg( "command",log_level_INFO,"My log message\n" );
     command_init( recv_cmd_state_ptr );
     char teststr[] = "junk  13\r"; 
     char *teststr_ptr = teststr;
