@@ -63,7 +63,7 @@
 *** DONE Implement suppressing log messages from one system [/]
     - This enum log system is crap.  I need to switch to an one-hot encoding for systems.  Let's just say that 16 systems will be enough, and define bit shifts for each system.
 **** Get rid of all the references to enumerated systems
-*** TODO Make sure the logger.h file is properly commented.  Copy the comments over to the c file.
+*** DONE Make sure the logger.h file is properly commented.  Copy the comments over to the c file.
 *** TODO Port the logging system over to the butterfly.
 * TODO Add section on command parsing to the howto
 * TODO Adjust one pencil channel's offset to 3.3V

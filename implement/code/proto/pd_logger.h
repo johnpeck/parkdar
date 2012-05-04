@@ -7,57 +7,76 @@
 /* Define the maximum log message size */
 #define LOGGER_BUFFERSIZE 80
  
-/* Each system_struct will describe one system */
-struct system_struct {
+/* Each system_struct will describe one system.  Create an array of these
+ * to define all systems recognized by the machine.  Each system can have
+ * a unique bit in the logger configuration bitfield.  This bit controls
+ * whether or not messages from that system will be printed. */
+typedef struct system_struct {
     char *name; // The name of the system
     uint8_t bitshift; // The system's location in the enable bitfield
-};
+} logger_system_t;
 
-/* Log levels recognized by the logger.  Logging can be configured to
- * only output messages above a certain level, with ALL being the lowest. */
+/* Log levels recognized by the logger.  Log messages must be tagged with
+ * one of these levels.  The messages will be sent to the output device
+ * if their level is at or above the logger's threshold. 
+ * 
+ * Use logger_setlevel() to set the level threshold. 
+ */
 typedef enum log_level {
-    log_level_ALL,
     log_level_INFO,
     log_level_WARNING,
-    log_level_ERROR,
-    log_level_NONE
-} log_level_t;
+    log_level_ERROR
+} logger_level_t;
 
-/* Logging configuration structure. */
+/* Logging configuration structure. 
+ */
 typedef struct logger_config_struct { 
     uint8_t enable; /* Bitfield in which each bit enables or disables
                       * log messages from the system defined by an array
                       * of system_struct */
-    log_level_t loglevel; // Only display messages at or above this level
-} logger_config_t;
+    logger_level_t loglevel; // Only display messages at or above this level
+} log_config_t;
 
 
-/* Initialize the logging system to a set of defaults. */  
+/* Initialize the logging system to a set of defaults. 
+ */  
 void logger_init();
 
 /* Set the log level 
- * Messages with loglevels above this setting will be logged.
- * Set log_level_NONE to turn logging off completely. 
- * Set log level_ALL to log messages with all loglevels. */
-void logger_setlevel( log_level_t loglevel );
+ * Messages with loglevels at or above this setting will be sent to the
+ *     output device.
+ */
+void logger_setlevel( logger_level_t loglevel );
 
-/* Set the system to log.  Find the list of system names defined in an
- * array of system_struct.  To log multiple systems, call logger_disable(),
- * then call this function for each system you'd like to log. */
+/* Enable a system for logging.  This sets a bit in the logging configuration
+ * structure's enable bitfield.  
+ * 
+ * To log multiple systems, call logger_disable(), then call this function 
+ * for each system you'd like to log. 
+ */
 void logger_setsystem( char *logsys );
 
 /* Turn off all logging. */
 void logger_disable();
 
-/* The interface to the logging system.  Programs should use this function
- * to send format strings to the logging device.  The actual logging device
- * should be chosen by modifying the logger_output() function. */
-void logger_msg( char *logsys, log_level_t loglevel, char *logmsg, ... ); 
+/* The interface to the logging system.  Use this function to send log
+ * messages.  
+ * 
+ * logsys is a freeform string that must match one of the system name
+ *     strings defined in an array of system structures.
+ * 
+ * loglevel is an enum defined above. 
+ * 
+ * logmsg is a format string -- the log message payload.
+ */
+void logger_msg( char *logsys, logger_level_t loglevel, char *logmsg, ... ); 
 
-/* Only print messages meant for the specified system */
+/* Called by logger_msg.  Filters out messages not enabled for logging.
+*/
 void logger_system_filter( char *logsys, char *logmsg );
 
-/* Choose the logging device -- how the log messages will actually be
- * printed out or saved.  During prototyping on the PC, this can just
- * be printf(). */
+/* Sends the final log message to the output device.  This function makes
+ * the output device more modular.  The output chosen in the implementation
+ * can be simply printf() for prototyping on a PC.
+ */
 void logger_output( char *logmsg );

@@ -9,12 +9,14 @@
 #include "pd_logger.h"
 
 // Define a pointer to the logging configuration
-logger_config_t logger_config;
-logger_config_t *logger_config_ptr = &logger_config;
+log_config_t logger_config;
+log_config_t *logger_config_ptr = &logger_config;
 
-/* An array of system_structs will contain our system definitions for
- * logging. */
-struct system_struct system_array[] ={
+/* Define the recognized systems.  The freeform system name will need
+ * to match calls to logger_msg().  Group systems to have shared bitshifts
+ * if you run out of space. 
+ */
+logger_system_t system_array[] ={
     // The logger system
     {"logger", // Name
     0 // Bitshift -- bit location in logging configuration bitfields
@@ -27,18 +29,25 @@ struct system_struct system_array[] ={
     {"",0}
 };
 
+/* Initialize the logger system. */
 void logger_init() {
     logger_config_ptr -> enable = 0xff; /* Logs from all systems enabled
                                          * by default. */
-    logger_config_ptr -> loglevel = log_level_ALL;
+    logger_config_ptr -> loglevel = log_level_INFO;
 }
 
-void logger_setlevel( log_level_t loglevel ) {
+/* Set the logging threshold level.
+ */
+void logger_setlevel( logger_level_t loglevel ) {
     logger_config_ptr -> loglevel = loglevel;
     logger_msg( "logger", log_level_INFO,
                 "Logging set to level %i\n",loglevel);
 }
 
+/* Set a bit in the logger configuration enable bitfield.  The system 
+ * whose bitshift corresponds to that bit will then be enabled for
+ * logging.
+ */
 void logger_setsystem( char *logsys ) {
     struct system_struct *system_array_ptr = system_array;
     // Go through all systems looking for a match to the system name
@@ -55,15 +64,22 @@ void logger_setsystem( char *logsys ) {
     return;
 }
 
+/* Clear all bits in the logger enable bitfield */
 void logger_disable() {
     logger_config_ptr -> enable = 0;
     return;
 }
 
-void logger_msg( char *logsys, log_level_t loglevel,char *logmsg, ... ) {
+/* Send a log message */
+void logger_msg( char *logsys, logger_level_t loglevel,char *logmsg, ... ) {
     va_list args; 
     uint8_t i; 
     char printbuffer[LOGGER_BUFFERSIZE]; 
+    
+    if (logger_config_ptr -> enable == 0) {
+        // Logging has been disabled.  Nothing to do.
+        return;
+    }     
     
     va_start (args, logmsg); 
     /* Make sure messages are never longer than printbuffer */
@@ -75,8 +91,11 @@ void logger_msg( char *logsys, log_level_t loglevel,char *logmsg, ... ) {
          * it on to be filtered by system. */
         logger_system_filter( logsys, printbuffer );
     }
+    return;
 }
 
+/* Decide if a message should be logged based on the logger configuration
+ * and the message tag. */
 void logger_system_filter( char *logsys, char *logmsg ) {
     char sysname[LOGGER_BUFFERSIZE];
     struct system_struct *system_array_ptr = system_array;
@@ -102,7 +121,9 @@ void logger_system_filter( char *logsys, char *logmsg ) {
     return;
 }
 
-
+/* Send the final string to the output device.  Change this function to
+ * suit whatever output device you'd like to use.
+ */
 void logger_output( char *logmsg ) {
     printf("%s",logmsg);
 }
