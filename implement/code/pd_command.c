@@ -8,11 +8,12 @@
  * an array containing all the commands understood by the system. */
 #include "pd_command.h"
 #include "pd_ranger.h"
+#include "pd_usart.h" // Provides usart_printf()
 
 
 
 /* An array of command_structs will contain our remote commands */
-struct command_struct command_array[] ={
+command_t command_array[] ={
     // The junk function
     {"junk", // Name
     "hex", // Argument type
@@ -33,12 +34,12 @@ struct command_struct command_array[] ={
 
 
 
-int check_argsize(recv_cmd_state_t *recv_cmd_state_ptr ,
-                    struct command_struct *command_array) {
-    int isok = 0;
-    printf("Checking argument of %s...\r\n", command_array -> name);
-    int argsize = strlen(recv_cmd_state_ptr -> pbuffer_arg_ptr);
-    printf("Argument size is %d\r\n", argsize);
+uint8_t check_argsize(recv_cmd_state_t *recv_cmd_state_ptr ,
+                      struct command_struct *command_array) {
+    uint8_t isok = 0;
+    usart_printf("Checking argument of %s...\r\n", command_array -> name);
+    uint8_t argsize = strlen(recv_cmd_state_ptr -> pbuffer_arg_ptr);
+    usart_printf("Argument size is %d\r\n", argsize);
     if (argsize > (command_array -> arg_max_chars)) {
         printf("Argument is bigger than the specified %d!\r\n",
                command_array -> arg_max_chars);
