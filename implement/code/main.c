@@ -22,6 +22,12 @@
 #include "pd_command.h"
 #include "pd_usart.h"
 
+/* pgmspace.h
+ * Contains macros and functions for saving and reading data out of
+ * flash.
+ */
+#include <avr/pgmspace.h>
+
 
 
 
