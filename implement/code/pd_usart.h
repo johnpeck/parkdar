@@ -5,8 +5,12 @@
 #define USART_TXBUFFERSIZE 80
 
 
-/* Send a formatted string to the USART interface */
-int usart_printf (const char *fmt, ...);
+/* Send a format string to the USART interface */
+uint8_t usart_printf (const char *fmt, ...);
+
+/* Send a format string stored in flash memory to the USART interface.
+ */
+uint8_t usart_printf_p(const char *fmt, ...);
 
 /* usart_receive
  * Simple USART receive function based on polling of the receive
@@ -23,7 +27,12 @@ void usart_putc(char data);
 
 /* usart_puts(char s[])
  * Sends a string over the USART by repeatedly calling usart_putc() */
-void usart_puts(char s[]);
+void usart_puts(const char s[]);
+
+/* usart_puts_p(const char *data)
+ * Sends strings stored in flash memory to the usart.
+ */
+void usart_puts_p(const char *data);
 
 
 /* usart_init()

@@ -10,6 +10,11 @@
 #include "pd_ranger.h"
 #include "pd_usart.h" // Provides usart_printf()
 
+/* pgmspace.h
+ * Contains macros and functions for saving and reading data out of
+ * flash.
+ */
+#include <avr/pgmspace.h>
 
 
 /* An array of command_structs will contain our remote commands */
@@ -37,11 +42,11 @@ command_t command_array[] ={
 uint8_t check_argsize(recv_cmd_state_t *recv_cmd_state_ptr ,
                       struct command_struct *command_array) {
     uint8_t isok = 0;
-    usart_printf("Checking argument of %s...\r\n", command_array -> name);
+    usart_printf_p(PSTR("Checking argument of %s...\r\n"), command_array -> name);
     uint8_t argsize = strlen(recv_cmd_state_ptr -> pbuffer_arg_ptr);
-    usart_printf("Argument size is %d\r\n", argsize);
+    usart_printf_p(PSTR("Argument size is %d\r\n"), argsize);
     if (argsize > (command_array -> arg_max_chars)) {
-        printf("Argument is bigger than the specified %d!\r\n",
+        usart_printf_p(PSTR("Argument is bigger than the specified %d!\r\n"),
                command_array -> arg_max_chars);
         isok = -1;
     }
@@ -60,34 +65,34 @@ void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
                     struct command_struct *command_array) {
     if ((recv_cmd_state_ptr -> pbuffer_lock) == 1) {
         // Parse buffer is locked -- there's a command to process
-        printf("Parse buffer is locked\r\n");
+        usart_printf_p(PSTR("Parse buffer is locked\r\n"));
         recv_cmd_state_ptr -> pbuffer_arg_ptr = strchr(recv_cmd_state_ptr -> pbuffer,' ');
         if (recv_cmd_state_ptr -> pbuffer_arg_ptr != NULL) {
             // Parse buffer contains a space -- there's an argument
-            printf("The command contains a space\r\n");
+            usart_printf_p(PSTR("The command contains a space\r\n"));
             *(recv_cmd_state_ptr -> pbuffer_arg_ptr) = '\0'; // Terminate the command string
             (recv_cmd_state_ptr -> pbuffer_arg_ptr)++;
             while (*(recv_cmd_state_ptr -> pbuffer_arg_ptr) == ' ') {
                 (recv_cmd_state_ptr -> pbuffer_arg_ptr)++; // Move to first non-space character
             }
             // arg_ptr now points to the beginning of the parameter
-            printf("The parameter is %s\r\n",(recv_cmd_state_ptr -> pbuffer_arg_ptr));
+            usart_printf_p(PSTR("The parameter is %s\r\n"),(recv_cmd_state_ptr -> pbuffer_arg_ptr));
         }
         // Look through the command list for a match
-        int pbuffer_match = 0;
+        uint8_t pbuffer_match = 0;
         while ((command_array -> execute) != 0) {
-            printf("Looking at command %s\r\n",
+            usart_printf_p(PSTR("Looking at command %s\r\n"),
                 command_array -> name);
             if (strcmp( recv_cmd_state_ptr -> pbuffer,
                 command_array -> name ) == 0) {
                 // We've found a matching command
-                printf("Match found \r\n");
+                usart_printf_p(PSTR("Match found \r\n"));
                 pbuffer_match = 1;
                 if (strcmp( command_array -> arg_type, "none") != 0) {
                     // The command is specified to have an argument
                     int arg_ok = check_argsize(recv_cmd_state_ptr,command_array);
                     if (arg_ok != 0) {
-                        printf("ERROR: Argument to %s is out of range.\r\n",
+                        usart_printf_p(PSTR("ERROR: Argument to %s is out of range.\r\n"),
                                command_array -> name);
                         }
                     else {
@@ -98,7 +103,7 @@ void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
                     // There's no argument specified
                     if (recv_cmd_state_ptr -> pbuffer_arg_ptr != NULL) {
                         // There's an argument, but we didn't expect one
-                        printf("WARNING: Ignoring argument\r\n");
+                        usart_printf_p(PSTR("WARNING: Ignoring argument\r\n"));
                     }
                     command_array -> execute();
                 }
@@ -109,7 +114,7 @@ void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
         }
         // If we didn't find a match, send an error message
         if (pbuffer_match == 0) {
-            printf("Unrecognized command: %s\r\n",
+            usart_printf_p(PSTR("Unrecognized command: %s\r\n"),
                    recv_cmd_state_ptr -> pbuffer); 
             recv_cmd_state_ptr -> pbuffer_lock = 0;
         }
