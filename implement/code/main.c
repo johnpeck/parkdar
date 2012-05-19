@@ -28,7 +28,8 @@
  */
 #include <avr/pgmspace.h>
 
-
+/* pd_logger.h sets up logging */
+#include "pd_logger.h"
 
 
 
@@ -51,6 +52,7 @@ recv_cmd_state_t *recv_cmd_state_ptr = &recv_cmd_state;
 
 
 int main(void) {
+    void logger_init( void );
     command_init( recv_cmd_state_ptr );
     int16_t adc_data = 0; // Allow for up to 64 averages
     sei(); // Enable interrupts
