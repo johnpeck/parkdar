@@ -8,6 +8,14 @@
 
 *------------- Tasks ------------------
 * <2012-02-18 Sat> Created puTTy configuration
+
+* -------------------- Specifications ---------------------------
+** System status and debugging messages must be able to be turned off.
+*** TODO All status messages must be printed using the logger module
+*** TODO Direct replies from the command module can never be disabled
+    - These are things like measurement results and status query replies.  
+*** TODO There must be a command to set the slope and offset pieces of a calibration structure.
+    - This takes care of my desire to have a command that takes a numeric parameter
 * ------------------------ TODO list ----------------------------
 * DONE Change references to LED in the code
   - The LED is now at PB6. The idea was that I'll never use OC1B.
