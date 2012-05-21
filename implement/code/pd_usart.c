@@ -3,8 +3,14 @@
 #include <avr/io.h>
 #include "pd_usart.h"
 
+/* pgmspace.h
+ * Contains macros and functions for saving and reading data out of
+ * flash.
+ */
+#include <avr/pgmspace.h>
+
 /* Send a formatted string to the USART interface */
-int usart_printf (const char *fmt, ...) { 
+uint8_t usart_printf (const char *fmt, ...) { 
     va_list args; 
     uint8_t i; 
     char printbuffer[USART_TXBUFFERSIZE]; 
@@ -20,7 +26,29 @@ int usart_printf (const char *fmt, ...) {
     /* Print the string */ 
     usart_puts(printbuffer); 
     return 0; 
-} 
+}
+
+/* Send a format string stored in flash memory to the USART interface.
+ */
+uint8_t usart_printf_p(const char *fmt, ...) {
+    va_list args; 
+    uint8_t i; 
+    char printbuffer[USART_TXBUFFERSIZE]; 
+
+    va_start (args, fmt); 
+
+    /* For this to work, printbuffer must be larger than 
+    * anything we ever want to print. 
+    */ 
+    i = vsprintf_P (printbuffer, fmt, args); 
+    va_end (args); 
+
+    /* Print the string */ 
+    usart_puts(printbuffer); 
+    return 0; 
+}    
+
+ 
 
 /* usart_receive
  * Simple USART receive function based on polling of the receive
@@ -45,12 +73,24 @@ void usart_putc(char data) {
 
 /* usart_puts(char s[])
  * Sends a string over the USART by repeatedly calling usart_putc() */
-void usart_puts(char s[]) {
+void usart_puts(const char s[]) {
     int i = 0;
     while(i < 64) // don't get stuck if it is a bad string
     {
         if( s[i] == '\0' ) break; // quit on string terminator
         usart_putc(s[i++]);
+    }
+}
+
+/* usart_puts_p(const char *data)
+ * Sends strings stored in flash memory to the usart.
+ */
+void usart_puts_p(const char *data_ptr) {
+    uint8_t txdata = 1; // Dummy initialization value
+    while ( txdata != 0x00 ) {
+        txdata = pgm_read_byte(data_ptr);
+        usart_putc(txdata);
+        data_ptr++;
     }
 }
 

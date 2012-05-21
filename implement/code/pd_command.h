@@ -24,8 +24,8 @@ typedef struct recv_cmd_struct {
      * allowed to exceed the buffer size).  */
     char pbuffer[PARSE_BUFFER_SIZE];
     char *pbuffer_arg_ptr; // Points to the beginning of the argument
-    int rbuffer_count; // Counts up as characters go into receive buffer.
-    int pbuffer_lock; // Parse buffer lock.  1 = locked
+    uint8_t rbuffer_count; // Counts up as characters go into receive buffer.
+    uint8_t pbuffer_lock; // Parse buffer lock.  1 = locked
 } recv_cmd_state_t;
 
 
@@ -33,17 +33,17 @@ typedef struct recv_cmd_struct {
  * value of void, and a parameter type of void. */
 typedef void (*fpointer_t)(void);
 /* Each command_struct will describe one command */
-struct command_struct {
+typedef struct command_struct {
     char *name; // The name of the command
     char *arg_type; // A string representing the type of argument expected
-    int arg_max_chars; // The maximum number of characters in the argument
+    uint8_t arg_max_chars; // The maximum number of characters in the argument
     fpointer_t execute; // The function to execute
     char *help;
-};
+} command_t;
 
 /* The array of command structures will have global scope.  The variable
  * command_array should be initialized in pd_command.c */
-extern struct command_struct command_array[];
+extern command_t command_array[];
 
 
 /* Initialize the received command state: Erase the buffers, reset
@@ -59,7 +59,7 @@ void command_init( recv_cmd_state_t *recv_cmd_state_ptr );
  *                pointer to list of commands )
  * Returns 0 if the argument size is less than or equal to the number
  * of characters specified in the command list.  Returns -1 otherwise. */
-int check_argsize(recv_cmd_state_t *recv_cmd_state_ptr ,
+uint8_t check_argsize(recv_cmd_state_t *recv_cmd_state_ptr ,
                   struct command_struct *command_array);
 
 

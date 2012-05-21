@@ -22,7 +22,14 @@
 #include "pd_command.h"
 #include "pd_usart.h"
 
+/* pgmspace.h
+ * Contains macros and functions for saving and reading data out of
+ * flash.
+ */
+#include <avr/pgmspace.h>
 
+/* pd_logger.h sets up logging */
+#include "pd_logger.h"
 
 
 
@@ -45,6 +52,7 @@ recv_cmd_state_t *recv_cmd_state_ptr = &recv_cmd_state;
 
 
 int main(void) {
+    void logger_init( void );
     command_init( recv_cmd_state_ptr );
     int16_t adc_data = 0; // Allow for up to 64 averages
     sei(); // Enable interrupts
@@ -53,11 +61,11 @@ int main(void) {
     usart_init(); // Set up the USART
     timer2_init();  // Set up, stop, and reset timer2
     timer0_init();
-    usart_puts("Initialize ADC\r\n");
+    usart_printf_p(PSTR("Initialize ADC\r\n"));
     adc_init();
-    usart_puts("Initialize LCD\r\n");
+    usart_puts_p(PSTR("Initialize LCD\r\n"));
     lcd_init(); // From LDC_driver
-    usart_puts("Start main loop\r\n");
+    usart_puts_p(PSTR("Start main loop\r\n"));
     lcd_puts("Hello",0); // From LCD_functions
     timer2_start(); // Start stimulus
     adc_mux(4); // Switch to ADC4
@@ -69,7 +77,7 @@ int main(void) {
             doread = 0;
         }
         else led(OFF);
-
+        process_pbuffer( recv_cmd_state_ptr, command_array );
     }// end main for loop
 } // end main
 
@@ -448,7 +456,7 @@ ISR(USART0_RX_vect) {
     uint8_t retval = 0;
     *(recv_cmd_state_ptr -> rbuffer_write_ptr) = UDR0; // Write the received character to the buffer
     if (*(recv_cmd_state_ptr -> rbuffer_write_ptr) == '\r') {
-        usart_printf("Found a terminator\r\n");
+        usart_printf_p(PSTR("Found a terminator\r\n"));
         if ((recv_cmd_state_ptr -> rbuffer_count) == 0) {
             /* We got a terminator, but the received character buffer is
              * empty.  The user is trying to clear the transmit and
@@ -461,7 +469,7 @@ ISR(USART0_RX_vect) {
                  * character buffer, but the parse buffer is locked.  This is
                  * bad -- we're receiving commands faster than we can process
                  * them. */
-                usart_printf("Command process speed error!\r\n");
+                usart_printf_p(PSTR("Command process speed error!\r\n"));
                 rbuffer_erase(recv_cmd_state_ptr);
                 return;
             }
@@ -472,8 +480,8 @@ ISR(USART0_RX_vect) {
                 *(recv_cmd_state_ptr -> rbuffer_write_ptr) = '\0';
                 strcpy((recv_cmd_state_ptr -> pbuffer),
                     (recv_cmd_state_ptr -> rbuffer));
-                //recv_cmd_state_ptr -> pbuffer_lock = 1;
-                usart_printf("Parse buffer contains %s\r\n",
+                recv_cmd_state_ptr -> pbuffer_lock = 1;
+                usart_printf_p(PSTR("Parse buffer contains %s\r\n"),
                     (recv_cmd_state_ptr -> pbuffer));
                 rbuffer_erase(recv_cmd_state_ptr);
                 return;
@@ -481,11 +489,11 @@ ISR(USART0_RX_vect) {
         }
     }
     else {
-        retval = usart_printf("%c  <-- Not a terminator.  Received count is %d\r\n",
+        retval = usart_printf_p(PSTR("%c  <-- Not a terminator.  Received count is %d\r\n"),
             *(recv_cmd_state_ptr -> rbuffer_write_ptr),
             recv_cmd_state_ptr -> rbuffer_count);
         if ((recv_cmd_state_ptr -> rbuffer_count) >= (RECEIVE_BUFFER_SIZE-1)) {
-            retval = usart_printf("Received character number above limit.\r\n");
+            retval = usart_printf_p(PSTR("Received character number above limit.\r\n"));
             rbuffer_erase(recv_cmd_state_ptr);
             return;
         }
