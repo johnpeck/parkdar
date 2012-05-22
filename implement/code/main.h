@@ -15,3 +15,4 @@ void led(uint8_t state);
 void timer0_init(void);
 void timer0_start(void);
 void timer0_stop(void);
+uint8_t main(void);

@@ -51,8 +51,11 @@ recv_cmd_state_t *recv_cmd_state_ptr = &recv_cmd_state;
 #define OFF 0
 
 
-int main(void) {
-    void logger_init( void );
+uint8_t main(void) {
+    logger_init();
+    logger_disable();
+    logger_setsystem( "logger" ); // Enable logger system logging
+    logger_setsystem( "command" ); // Enable command system logging
     command_init( recv_cmd_state_ptr );
     int16_t adc_data = 0; // Allow for up to 64 averages
     sei(); // Enable interrupts
@@ -79,6 +82,7 @@ int main(void) {
         else led(OFF);
         process_pbuffer( recv_cmd_state_ptr, command_array );
     }// end main for loop
+    return 0;
 } // end main
 
 /* led(desired state)
@@ -454,9 +458,10 @@ ISR(TIMER0_COMP_vect) {
 /* Interrupt on character received via the USART */
 ISR(USART0_RX_vect) {
     uint8_t retval = 0;
-    *(recv_cmd_state_ptr -> rbuffer_write_ptr) = UDR0; // Write the received character to the buffer
+    // Write the received character to the buffer
+    *(recv_cmd_state_ptr -> rbuffer_write_ptr) = UDR0;
     if (*(recv_cmd_state_ptr -> rbuffer_write_ptr) == '\r') {
-        usart_printf_p(PSTR("Found a terminator\r\n"));
+        logger_msg_p("command",log_level_INFO,PSTR("Found a terminator\r\n"));
         if ((recv_cmd_state_ptr -> rbuffer_count) == 0) {
             /* We got a terminator, but the received character buffer is
              * empty.  The user is trying to clear the transmit and
@@ -469,7 +474,8 @@ ISR(USART0_RX_vect) {
                  * character buffer, but the parse buffer is locked.  This is
                  * bad -- we're receiving commands faster than we can process
                  * them. */
-                usart_printf_p(PSTR("Command process speed error!\r\n"));
+                logger_msg_p("command",log_level_ERROR,
+                    PSTR("Command process speed error!\r\n"));
                 rbuffer_erase(recv_cmd_state_ptr);
                 return;
             }
@@ -481,7 +487,8 @@ ISR(USART0_RX_vect) {
                 strcpy((recv_cmd_state_ptr -> pbuffer),
                     (recv_cmd_state_ptr -> rbuffer));
                 recv_cmd_state_ptr -> pbuffer_lock = 1;
-                usart_printf_p(PSTR("Parse buffer contains %s\r\n"),
+                logger_msg_p("command",log_level_INFO,
+                    PSTR("Parse buffer contains %s\r\n"),
                     (recv_cmd_state_ptr -> pbuffer));
                 rbuffer_erase(recv_cmd_state_ptr);
                 return;
@@ -489,11 +496,13 @@ ISR(USART0_RX_vect) {
         }
     }
     else {
-        retval = usart_printf_p(PSTR("%c  <-- Not a terminator.  Received count is %d\r\n"),
+        logger_msg_p("command",log_level_INFO,
+            PSTR("%c  <-- Not a terminator.  Received count is %d\r\n"),
             *(recv_cmd_state_ptr -> rbuffer_write_ptr),
             recv_cmd_state_ptr -> rbuffer_count);
         if ((recv_cmd_state_ptr -> rbuffer_count) >= (RECEIVE_BUFFER_SIZE-1)) {
-            retval = usart_printf_p(PSTR("Received character number above limit.\r\n"));
+            logger_msg_p("command",log_level_ERROR,
+                PSTR("Received character number above limit.\r\n"));
             rbuffer_erase(recv_cmd_state_ptr);
             return;
         }

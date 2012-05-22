@@ -69,7 +69,12 @@ void logger_disable( void );
  * 
  * logmsg is a format string -- the log message payload.
  */
-void logger_msg( char *logsys, logger_level_t loglevel, char *logmsg, ... ); 
+void logger_msg( char *logsys, logger_level_t loglevel, char *logmsg, ... );
+
+/* The same as logger_msg, but called with a string located in flash
+ * memory.
+ */
+void logger_msg_p( char *logsys, logger_level_t loglevel,const char *logmsg, ... );
 
 /* Called by logger_msg.  Filters out messages not enabled for logging.
 */

@@ -7,6 +7,7 @@
 #include <stdarg.h> // Allows functions to accept an indefinite number of arguments
 #include <stdint.h> // Defines uint8_t
 #include "pd_logger.h"
+#include "pd_usart.h"
 
 /* pgmspace.h
  * Contains macros and functions for saving and reading data out of
@@ -90,6 +91,30 @@ void logger_msg( char *logsys, logger_level_t loglevel,char *logmsg, ... ) {
     va_start (args, logmsg); 
     /* Make sure messages are never longer than printbuffer */
     i = vsnprintf (printbuffer, LOGGER_BUFFERSIZE, logmsg, args); 
+    va_end (args); 
+    
+    if (loglevel >= (logger_config_ptr -> loglevel)) {
+        /* If this message's level is high enough to be logged, we send
+         * it on to be filtered by system. */
+        logger_system_filter( logsys, printbuffer );
+    }
+    return;
+}
+
+/* Send a log message with a string located in flash memory */
+void logger_msg_p( char *logsys, logger_level_t loglevel,const char *logmsg, ... ) {
+    va_list args; 
+    uint8_t i; 
+    char printbuffer[LOGGER_BUFFERSIZE]; 
+    
+    if (logger_config_ptr -> enable == 0) {
+        // Logging has been disabled.  Nothing to do.
+        return;
+    }     
+    
+    va_start (args, logmsg); 
+    /* Make sure messages are never longer than printbuffer */
+    i = vsnprintf_P (printbuffer, LOGGER_BUFFERSIZE, logmsg, args); 
     va_end (args); 
     
     if (loglevel >= (logger_config_ptr -> loglevel)) {
