@@ -18,7 +18,7 @@ long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=2
+current_page=7
 FILE_NAME_0=2494;Make;0;16;1;1;0;/home/john/projects/parkdar/implement/code/makefile;0;4
 FILE_NAME_1=395;C;0;16;0;1;0;/home/john/projects/parkdar/implement/code/main.h;0;4
 FILE_NAME_2=16335;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/main.c;0;4
@@ -30,10 +30,9 @@ FILE_NAME_7=1515;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/pd_comm
 FILE_NAME_8=4316;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/pd_command.c;0;4
 FILE_NAME_9=624;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/pd_usart.c;0;4
 FILE_NAME_10=1030;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/pd_usart.h;0;4
-FILE_NAME_11=19034;None;0;16;0;1;1;/home/john/projects/parkdar/implement/code/main.map;0;4
-FILE_NAME_12=2192;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/proto/main.c;0;4
-FILE_NAME_13=3369;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/pd_logger.c;0;4
-FILE_NAME_14=2333;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/pd_logger.h;0;4
+FILE_NAME_11=2192;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/proto/main.c;0;4
+FILE_NAME_12=3369;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/pd_logger.c;0;4
+FILE_NAME_13=2333;C;0;16;0;1;1;/home/john/projects/parkdar/implement/code/pd_logger.h;0;4
 
 [VTE]
 last_dir=/home/john/projects/resgen
