@@ -32,6 +32,10 @@ logger_system_t system_array[] ={
     {"command",
     1
     },
+    // The ranger system
+    {"ranger",
+    2
+    },
     // End of table indicator.  Must be last.
     {"",0}
 };
@@ -62,8 +66,8 @@ void logger_setsystem( char *logsys ) {
         if (strcmp( logsys, system_array_ptr -> name ) == 0) {
             // We've found a matching system
             (logger_config_ptr -> enable) |= (1<< (system_array_ptr -> bitshift));
-            logger_msg("logger", log_level_INFO, 
-                "Now logging system %s\n", system_array_ptr -> name);
+            logger_msg_p("logger", log_level_INFO, 
+                PSTR("Now logging system %s\r\n"), system_array_ptr -> name);
             break;
         }
         system_array_ptr++;

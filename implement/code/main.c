@@ -52,16 +52,17 @@ recv_cmd_state_t *recv_cmd_state_ptr = &recv_cmd_state;
 
 
 uint8_t main(void) {
+    sei(); // Enable interrupts
+    fosc_cal(); // Set up calibrated 1MHz system clock
+    usart_init(); // Set up the USART
     logger_init();
     logger_disable();
     logger_setsystem( "logger" ); // Enable logger system logging
     logger_setsystem( "command" ); // Enable command system logging
+    logger_setsystem( "ranger" ); // Enable ranger system logging
     command_init( recv_cmd_state_ptr );
     int16_t adc_data = 0; // Allow for up to 64 averages
-    sei(); // Enable interrupts
-    fosc_cal(); // Set calibrated 1MHz system clock
     portb_init(); // Set up port B
-    usart_init(); // Set up the USART
     timer2_init();  // Set up, stop, and reset timer2
     timer0_init();
     usart_printf_p(PSTR("Initialize ADC\r\n"));

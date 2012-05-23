@@ -2,6 +2,7 @@
  * 
  * Functions for dealing with range finding */
 
+
 /* Calibration structure */
 struct cal_struct {
     uint8_t slope; // Measurements are multiplied by this factor before offset
