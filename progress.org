@@ -53,26 +53,15 @@
 ** DONE Make a flow diagram for command parsing
 ** TODO Figure out how to convert hex string to integer
    - This can be rolled up with figuring out if my function pointers can take and return arguments.  I'll make a function that takes in a string of characters, and converts them to a number (if possible).
-* TODO Add logging system that can be turned on and off
-** The logging system needs
-*** DONE Document logging levels in h file
-*** DONE Implement logger_start
-    DEADLINE: <2012-04-25 Wed>
-    - Call it in main() so that it gets used
-*** DONE Fix logger_msg
-    - There must be a better way of separating the messages by level
-*** DONE Implement logger_init
-    - This should set default log levels and systems.
-*** Log calls must be separated by system, logging level, and message
-**** Log levels: information, warning, error
-**** Log systems: ranger, command
-*** DONE Make the printing mechanism more modular for the logger
-    - Ideally, you would just give the logger system the name of the function you want to use to print strings (not even formatted strings, since we use sprintf for that)
-*** DONE Implement suppressing log messages from one system [/]
-    - This enum log system is crap.  I need to switch to an one-hot encoding for systems.  Let's just say that 16 systems will be enough, and define bit shifts for each system.
-**** Get rid of all the references to enumerated systems
-*** DONE Make sure the logger.h file is properly commented.  Copy the comments over to the c file.
-*** TODO Port the logging system over to the butterfly.
+* TODO Work on logging system [/]
+** TODO Add logging remote commands [/]
+*** TODO logset -- set or query the enable value of the logging configuration structure
+**** Argument: hex value of enable data
+**** Return value: hex value of the enable data
+*** TODO logsys -- set only command that enables a system for logging.
+**** Argument: string name of system
+** TODO Add command_exec() function to command.c
+   - This function will take a pointer to the member of command_array[] that you want executed along with a pointer to the argument you want passed.  This pointer will of course be NULL for commands that don't take an argument.
 * TODO Add section on command parsing to the howto
 * TODO Adjust one pencil channel's offset to 3.3V
 * TODO Stock pencils power supply rise time is too slow

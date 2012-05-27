@@ -1,6 +1,7 @@
 /* pd_command.h
  * 
- * Used to set up the parkdar command interface. */
+ * Used to set up the parkdar command interface. 
+ */
 
 
 
@@ -51,6 +52,10 @@ extern command_t command_array[];
  * the write and argument pointers, zero the received character
  * counter, and unlock the parse buffer. */
 void command_init( recv_cmd_state_t *recv_cmd_state_ptr );
+
+/* Execute a valid command received over the remote interface.
+ */
+void command_exec( command_t *command, char *argument );
 
 
 

@@ -16,6 +16,15 @@
  */
 #include <avr/pgmspace.h>
 
+/* pd_logger.h
+ * Provides logger_msg and logger_msg_p for log messages tagged with
+ * a system and severity.
+ */
+#include "pd_logger.h"
+
+
+
+
 
 /* An array of command_structs will contain our remote commands */
 command_t command_array[] ={
@@ -42,7 +51,8 @@ command_t command_array[] ={
 uint8_t check_argsize(recv_cmd_state_t *recv_cmd_state_ptr ,
                       struct command_struct *command_array) {
     uint8_t isok = 0;
-    usart_printf_p(PSTR("Checking argument of %s...\r\n"), command_array -> name);
+    logger_msg_p("command",log_level_INFO,
+        PSTR("Checking argument of %s...\r\n"), command_array -> name);
     uint8_t argsize = strlen(recv_cmd_state_ptr -> pbuffer_arg_ptr);
     usart_printf_p(PSTR("Argument size is %d\r\n"), argsize);
     if (argsize > (command_array -> arg_max_chars)) {
@@ -90,13 +100,15 @@ void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
                 pbuffer_match = 1;
                 if (strcmp( command_array -> arg_type, "none") != 0) {
                     // The command is specified to have an argument
-                    int arg_ok = check_argsize(recv_cmd_state_ptr,command_array);
+                    uint8_t arg_ok = check_argsize(recv_cmd_state_ptr,command_array);
                     if (arg_ok != 0) {
                         usart_printf_p(PSTR("ERROR: Argument to %s is out of range.\r\n"),
                                command_array -> name);
                         }
                     else {
-                        command_array -> execute();
+                        // The argument is the right size
+                        command_exec(command_array,recv_cmd_state_ptr -> pbuffer_arg_ptr);
+                        // command_array -> execute();
                     }
                 }
                 else  {
@@ -105,7 +117,7 @@ void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
                         // There's an argument, but we didn't expect one
                         usart_printf_p(PSTR("WARNING: Ignoring argument\r\n"));
                     }
-                    command_array -> execute();
+                    command_exec(command_array,NULL);
                 }
                 recv_cmd_state_ptr -> pbuffer_lock = 0;
                 break;
@@ -137,5 +149,20 @@ void command_init( recv_cmd_state_t *recv_cmd_state_ptr ) {
     return;
 }
 
-
+/* Execute a valid command received over the remote interface.
+ */
+void command_exec( command_t *command, char *argument ) {
+    if (strcmp( command -> arg_type,"none" ) == 0) {
+        // There's no argument
+        logger_msg_p("command",log_level_INFO,
+            PSTR("Executing command with no argument\r\n"));
+        command -> execute();
+    }
+    else if (strcmp( command -> arg_type,"hex" ) == 0) {
+        // There's a hex argument
+        logger_msg_p("command",log_level_INFO,
+            PSTR("Executing command with hex argument\r\n"));
+        command -> execute();
+    }
+}
 
