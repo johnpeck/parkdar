@@ -22,6 +22,11 @@
  */
 #include "pd_logger.h"
 
+/* pd_numbers.h
+ * Provides ascii to number conversion.
+ */
+#include "pd_numbers.h"
+
 
 
 
@@ -152,6 +157,7 @@ void command_init( recv_cmd_state_t *recv_cmd_state_ptr ) {
 /* Execute a valid command received over the remote interface.
  */
 void command_exec( command_t *command, char *argument ) {
+    uint16_t argval = 0; // Decimal value of the argument
     if (strcmp( command -> arg_type,"none" ) == 0) {
         // There's no argument
         logger_msg_p("command",log_level_INFO,
@@ -162,6 +168,9 @@ void command_exec( command_t *command, char *argument ) {
         // There's a hex argument
         logger_msg_p("command",log_level_INFO,
             PSTR("Executing command with hex argument\r\n"));
+        argval = hex2num(argument);
+        logger_msg_p("command",log_level_INFO,
+            PSTR("The hex value is %d.\r\n"),argval);
         command -> execute();
     }
 }

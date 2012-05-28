@@ -53,7 +53,7 @@
 ** DONE Make a flow diagram for command parsing
 ** TODO Figure out how to convert hex string to integer
    - This can be rolled up with figuring out if my function pointers can take and return arguments.  I'll make a function that takes in a string of characters, and converts them to a number (if possible).
-* TODO Work on logging system [/]
+* TODO Work on logging system [0/2]
 ** TODO Add logging remote commands [/]
 *** TODO logset -- set or query the enable value of the logging configuration structure
 **** Argument: hex value of enable data

@@ -80,7 +80,8 @@ SRC = 	$(TARGET).c \
 		pd_ranger.c \
 		pd_command.c \
 		pd_usart.c \
-		pd_logger.c
+		pd_logger.c \
+		pd_numbers.c
 
 
 # List C++ source files here. (C dependencies are automatically generated.)

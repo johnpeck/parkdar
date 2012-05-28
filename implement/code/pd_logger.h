@@ -56,6 +56,13 @@ void logger_setlevel( logger_level_t loglevel );
  */
 void logger_setsystem( char *logsys );
 
+/* Set the logger configuration enable byte directly.  You have to know
+ * which systems correspond to which bitshifts to make use of this.
+ */
+void logger_setbyte( uint8_t setval );
+
+
+
 /* Turn off all logging. */
 void logger_disable( void );
 

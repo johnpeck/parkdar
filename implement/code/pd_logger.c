@@ -55,6 +55,12 @@ void logger_setlevel( logger_level_t loglevel ) {
                 "Logging set to level %i\n",loglevel);
 }
 
+/* Set the logger enable byte.
+ */
+void logger_setbyte( uint8_t setval ) {
+    (logger_config_ptr -> enable) = setval;
+}
+
 /* Set a bit in the logger configuration enable bitfield.  The system 
  * whose bitshift corresponds to that bit will then be enabled for
  * logging.
