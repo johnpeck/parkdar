@@ -10,6 +10,11 @@
 #include "pd_ranger.h"
 #include "pd_usart.h" // Provides usart_printf()
 
+/* pd_ascii.h
+ * Provides lowstring() for converting strings to lower case.
+ */
+#include "pd_ascii.h"
+
 /* pgmspace.h
  * Contains macros and functions for saving and reading data out of
  * flash.
@@ -93,6 +98,7 @@ void process_pbuffer( recv_cmd_state_t *recv_cmd_state_ptr ,
             // arg_ptr now points to the beginning of the parameter
             usart_printf_p(PSTR("The parameter is %s\r\n"),(recv_cmd_state_ptr -> pbuffer_arg_ptr));
         }
+        lowstring(recv_cmd_state_ptr -> pbuffer); // Convert command to lower case
         // Look through the command list for a match
         uint8_t pbuffer_match = 0;
         while ((command_array -> execute) != 0) {
