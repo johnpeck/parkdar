@@ -12,9 +12,9 @@ struct cal_struct {
 
 /* This is the junk function.
  * It's great */
-void junkfunc(void);
+void junkfunc(uint16_t);
 
 
 /* This is the crap function.
  * It's also great */
-void crapfunc(void);
+void crapfunc(uint16_t);

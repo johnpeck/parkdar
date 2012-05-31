@@ -39,17 +39,22 @@
 /* An array of command_structs will contain our remote commands */
 command_t command_array[] ={
     // The junk function
-    {"junk", // Name
-    "hex", // Argument type
-    2, // Maximum number of characters in argument
-    &junkfunc,
-    "Some junk"},
+    {"junk",   // Name
+    "hex",     // Argument type
+    2,         // Maximum number of characters in argument
+    &junkfunc, // Address of function to execute
+    "Some junk"}, // Help string
     // The crap function
     {"crap",
     "none",
     0,
     &crapfunc,
     "Some crap"},
+    {"logreg",
+     "hex",
+     4,
+     &cmd_logger_setreg,
+     "Some help"},
     // End of table indicator.  Must be last.
     {"","",0,0,""}
 };
@@ -168,7 +173,7 @@ void command_exec( command_t *command, char *argument ) {
         // There's no argument
         logger_msg_p("command",log_level_INFO,
             PSTR("Executing command with no argument\r\n"));
-        command -> execute();
+        command -> execute(0);
     }
     else if (strcmp( command -> arg_type,"hex" ) == 0) {
         // There's a hex argument
@@ -177,7 +182,7 @@ void command_exec( command_t *command, char *argument ) {
         argval = hex2num(argument);
         logger_msg_p("command",log_level_INFO,
             PSTR("The hex value is %d.\r\n"),argval);
-        command -> execute();
+        command -> execute(argval);
     }
 }
 

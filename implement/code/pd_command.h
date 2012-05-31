@@ -32,7 +32,11 @@ typedef struct recv_cmd_struct {
 
 /* Define fpointer_t to have the type "pointer to function," a return
  * value of void, and a parameter type of void. */
-typedef void (*fpointer_t)(void);
+ 
+/* In order to make all functions called by remote commands take the same
+ * arguments, we settle on them all taking a 16-bit argument.
+ */
+typedef void (*fpointer_t)(uint16_t argval);
 /* Each command_struct will describe one command */
 typedef struct command_struct {
     char *name; // The name of the command

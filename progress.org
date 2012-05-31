@@ -55,7 +55,7 @@
    - This can be rolled up with figuring out if my function pointers can take and return arguments.  I'll make a function that takes in a string of characters, and converts them to a number (if possible).
 * TODO Work on logging system [0/2]
 ** TODO Add logging remote commands [/]
-*** TODO logset -- set or query the enable value of the logging configuration structure
+*** TODO logreg -- set or query the enable register of the logging configuration structure
 **** Argument: hex value of enable data
 **** Return value: hex value of the enable data
 *** TODO logsys -- set only command that enables a system for logging.

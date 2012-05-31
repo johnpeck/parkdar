@@ -11,12 +11,12 @@
 /* pd_logger.h sets up logging */
 #include "pd_logger.h"
 
-void junkfunc(void) {
+void junkfunc(uint16_t junkval) {
     logger_msg_p("ranger",log_level_INFO,PSTR("This is all junk!\r\n"));
     return;
 }
 
-void crapfunc(void) {
+void crapfunc(uint16_t crapval) {
     logger_msg_p("ranger",log_level_INFO,PSTR("This is all crap!\r\n"));
     return;
 }

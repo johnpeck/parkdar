@@ -13,7 +13,7 @@
  * whether or not messages from that system will be printed. */
 typedef struct system_struct {
     char *name; // The name of the system
-    uint8_t bitshift; // The system's location in the enable bitfield
+    uint8_t bitshift; // The system's location in the enable register
 } logger_system_t;
 
 /* Log levels recognized by the logger.  Log messages must be tagged with
@@ -31,7 +31,7 @@ typedef enum log_level {
 /* Logging configuration structure. 
  */
 typedef struct logger_config_struct { 
-    uint8_t enable; /* Bitfield in which each bit enables or disables
+    uint16_t enable; /* Bitfield in which each bit enables or disables
                       * log messages from the system defined by an array
                       * of system_struct */
     logger_level_t loglevel; // Only display messages at or above this level
@@ -56,10 +56,11 @@ void logger_setlevel( logger_level_t loglevel );
  */
 void logger_setsystem( char *logsys );
 
-/* Set the logger configuration enable byte directly.  You have to know
- * which systems correspond to which bitshifts to make use of this.
+/* Called by the remote command "logreg." Sets the logger configuration 
+ * enable byte directly.  You have to know which systems correspond to 
+ * which bitshifts to make use of this.
  */
-void logger_setbyte( uint8_t setval );
+void cmd_logger_setreg( uint16_t setval );
 
 
 
